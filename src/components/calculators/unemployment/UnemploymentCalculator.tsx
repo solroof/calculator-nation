@@ -1,0 +1,165 @@
+"use client";
+
+import { useState } from 'react';
+import { unemploymentCalculator } from '@/lib/math/unemployment-calculator';
+import type { UnemploymentResult } from '@/lib/types/unemployment';
+
+function formatWon(num: number): string {
+  return num.toLocaleString('ko-KR') + '원';
+}
+
+export function UnemploymentCalculator() {
+  const [age, setAge] = useState<string>('35');
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [insuranceYears, setInsuranceYears] = useState<string>('3');
+  const [avgMonthlyWage, setAvgMonthlyWage] = useState<string>('3000000');
+  const [result, setResult] = useState<UnemploymentResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleCalculate = () => {
+    setError(null);
+    setResult(null);
+
+    const years = parseFloat(insuranceYears);
+    if (years < 1) {
+      setError('고용보험 가입기간이 1년 이상이어야 실업급여 수급 가능합니다.');
+      return;
+    }
+
+    const calcResult = unemploymentCalculator.calculate({
+      age: parseInt(age) || 35,
+      isDisabled,
+      insuranceYears: years,
+      avgMonthlyWage: parseInt(avgMonthlyWage.replace(/,/g, '')) || 0,
+    });
+
+    setResult(calcResult);
+  };
+
+  return (
+    <div id="unemployment" className="scroll-mt-20">
+      {/* 헤더 */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="text-lg font-bold text-gray-800">실업급여 계산기</h2>
+          <p className="text-xs text-gray-500">고용보험 기반 예상 수급액</p>
+        </div>
+        <span className="text-2xl">📋</span>
+      </div>
+
+      {/* 입력 폼 */}
+      <div className="space-y-4 mb-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">나이</label>
+            <input
+              type="number"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
+              min="18"
+              max="65"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">가입기간 (년)</label>
+            <input
+              type="number"
+              value={insuranceYears}
+              onChange={(e) => setInsuranceYears(e.target.value)}
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
+              min="0"
+              step="0.5"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            퇴직 전 3개월 평균 월급 (세전)
+          </label>
+          <div className="relative">
+            <input
+              type="text"
+              value={parseInt(avgMonthlyWage || '0').toLocaleString()}
+              onChange={(e) => setAvgMonthlyWage(e.target.value.replace(/[^0-9]/g, ''))}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-lg font-medium focus:ring-2 focus:ring-blue-500"
+            />
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">원</span>
+          </div>
+        </div>
+
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={isDisabled}
+            onChange={(e) => setIsDisabled(e.target.checked)}
+            className="w-4 h-4 rounded border-gray-300 text-blue-500"
+          />
+          <span className="text-sm text-gray-700">장애인 여부</span>
+        </label>
+      </div>
+
+      {/* 계산 버튼 */}
+      <button
+        onClick={handleCalculate}
+        className="w-full py-3.5 rounded-xl font-medium text-base bg-blue-500 text-white active:bg-blue-600 shadow-sm transition-all mb-4"
+      >
+        계산하기
+      </button>
+
+      {/* 에러 */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      )}
+
+      {/* 결과 */}
+      {result && (
+        <div className="space-y-4">
+          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-5 text-white">
+            <p className="text-purple-100 text-sm mb-1">예상 총 수령액</p>
+            <p className="text-3xl font-bold mb-3">{formatWon(result.totalBenefit)}</p>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div>
+                <p className="text-purple-200">일 실업급여</p>
+                <p className="font-medium">{formatWon(result.dailyBenefit)}</p>
+              </div>
+              <div>
+                <p className="text-purple-200">월 예상 수령액</p>
+                <p className="font-medium">{formatWon(result.monthlyBenefit)}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-xl p-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <p className="text-xs text-gray-500">총 지급일수</p>
+                <p className="text-xl font-bold text-gray-800">{result.totalDays}일</p>
+              </div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <p className="text-xs text-gray-500">수급기간</p>
+                <p className="text-xl font-bold text-gray-800">약 {result.durationMonths}개월</p>
+              </div>
+            </div>
+
+            {(result.details.isMinApplied || result.details.isMaxApplied) && (
+              <div className="mt-3 p-2 bg-yellow-50 rounded-lg">
+                <p className="text-xs text-yellow-700">
+                  {result.details.isMinApplied && '※ 최저 일액이 적용되었습니다.'}
+                  {result.details.isMaxApplied && '※ 상한액이 적용되었습니다.'}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className="mt-6 py-4 text-center text-gray-400 text-xs border-t border-gray-100">
+        <p>2024년 기준 · 실제 수급액과 다를 수 있음</p>
+      </div>
+    </div>
+  );
+}

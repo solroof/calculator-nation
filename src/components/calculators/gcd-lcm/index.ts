@@ -1,0 +1,1 @@
+export { GcdLcmCalculator } from "./GcdLcmCalculator";

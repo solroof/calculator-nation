@@ -1,0 +1,1 @@
+export { PrimeCalculator } from "./PrimeCalculator";

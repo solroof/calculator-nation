@@ -1,0 +1,1 @@
+export { AreaCalculator } from "./AreaCalculator";

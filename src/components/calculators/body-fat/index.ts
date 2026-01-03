@@ -1,0 +1,1 @@
+export { BodyFatCalculator } from "./BodyFatCalculator";

@@ -1,0 +1,1 @@
+export { CapitalGainsTaxCalculator } from './CapitalGainsTaxCalculator';

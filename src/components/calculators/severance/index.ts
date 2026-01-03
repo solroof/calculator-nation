@@ -1,0 +1,1 @@
+export { SeveranceCalculator } from './SeveranceCalculator';

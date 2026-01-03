@@ -1,0 +1,1 @@
+export { ShapeDividerCalculator } from './ShapeDividerCalculator';

@@ -1,0 +1,1 @@
+export { StockReturnCalculator } from "./StockReturnCalculator";

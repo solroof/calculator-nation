@@ -1,0 +1,1 @@
+export { WaterIntakeCalculator } from "./WaterIntakeCalculator";

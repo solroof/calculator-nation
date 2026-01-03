@@ -1,0 +1,1 @@
+export { RectangleCalculator } from "./RectangleCalculator";

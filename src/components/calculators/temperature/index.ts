@@ -1,0 +1,1 @@
+export { TemperatureCalculator } from "./TemperatureCalculator";
