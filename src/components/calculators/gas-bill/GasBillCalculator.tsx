@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 // 2024년 기준 도시가스 요금 (서울도시가스 기준, MJ당)
 const gasRates = {
@@ -10,11 +11,11 @@ const gasRates = {
 };
 
 export function GasBillCalculator() {
-  const [usage, setUsage] = useState("30");
+  const [usage, setUsage] = useState<number>(30);
   const [season, setSeason] = useState("winter");
 
   const calculate = () => {
-    const usageValue = parseFloat(usage) || 0;
+    const usageValue = usage || 0;
     const rates = gasRates[season as keyof typeof gasRates];
 
     // MJ를 m³로 변환 (1m³ ≈ 43.1MJ)
@@ -52,12 +53,13 @@ export function GasBillCalculator() {
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">사용량 (m³)</label>
-          <input
-            type="number"
+          <NumberInput
             value={usage}
-            onChange={(e) => setUsage(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 text-lg"
-            placeholder="30"
+            onChange={setUsage}
+            min={0}
+            step={1}
+            format="comma"
+            suffix="m³"
           />
         </div>
 
@@ -115,9 +117,16 @@ export function GasBillCalculator() {
         </div>
       </div>
 
-      <p className="text-xs text-gray-400 mt-4 text-center">
-        * 요금은 지역 및 요금제에 따라 다를 수 있습니다
-      </p>
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• MJ = m³ × 43.1 (열량 환산)</p>
+          <p>• 사용요금 = MJ × 단가(원/MJ)</p>
+          <p>• 가스요금 = 기본요금 + 사용요금</p>
+          <p>• 총 요금 = 가스요금 × 1.1 (VAT 포함)</p>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">서울도시가스 기준 · 지역별로 다를 수 있음</p>
+      </div>
     </div>
   );
 }

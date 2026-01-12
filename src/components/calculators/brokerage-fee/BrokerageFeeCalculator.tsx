@@ -1,24 +1,25 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 type TransactionType = "sale" | "rent" | "jeonse";
 
 export function BrokerageFeeCalculator() {
   const [transactionType, setTransactionType] = useState<TransactionType>("sale");
-  const [price, setPrice] = useState("50000");
-  const [deposit, setDeposit] = useState("30000");
-  const [monthlyRent, setMonthlyRent] = useState("100");
+  const [price, setPrice] = useState<number>(50000);
+  const [deposit, setDeposit] = useState<number>(30000);
+  const [monthlyRent, setMonthlyRent] = useState<number>(100);
 
   const calculateFee = () => {
     let amount = 0;
 
     if (transactionType === "sale" || transactionType === "jeonse") {
-      amount = parseInt(price) * 10000; // 만원 단위
+      amount = (price || 0) * 10000; // 만원 단위
     } else {
       // 월세: 보증금 + (월세 × 100)
-      const dep = parseInt(deposit) * 10000;
-      const rent = parseInt(monthlyRent) * 10000;
+      const dep = (deposit || 0) * 10000;
+      const rent = (monthlyRent || 0) * 10000;
       amount = dep + rent * 100;
       // 단, 5천만원 미만이면 보증금 + (월세 × 70)
       if (amount < 50000000) {
@@ -131,22 +132,24 @@ export function BrokerageFeeCalculator() {
           <>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">보증금 (만원)</label>
-              <input
-                type="number"
+              <NumberInput
                 value={deposit}
-                onChange={(e) => setDeposit(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-lg"
-                placeholder="예: 30000"
+                onChange={setDeposit}
+                min={0}
+                step={100}
+                format="comma"
+                suffix="만원"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">월세 (만원)</label>
-              <input
-                type="number"
+              <NumberInput
                 value={monthlyRent}
-                onChange={(e) => setMonthlyRent(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-lg"
-                placeholder="예: 100"
+                onChange={setMonthlyRent}
+                min={0}
+                step={10}
+                format="comma"
+                suffix="만원"
               />
             </div>
           </>
@@ -155,12 +158,13 @@ export function BrokerageFeeCalculator() {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               {transactionType === "sale" ? "매매가" : "전세금"} (만원)
             </label>
-            <input
-              type="number"
+            <NumberInput
               value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-lg"
-              placeholder="예: 50000"
+              onChange={setPrice}
+              min={0}
+              step={1000}
+              format="comma"
+              suffix="만원"
             />
           </div>
         )}
@@ -198,12 +202,19 @@ export function BrokerageFeeCalculator() {
       )}
 
       <div className="mt-4 p-4 bg-gray-50 rounded-xl">
-        <p className="text-sm font-medium text-gray-700 mb-2">주택 중개보수 요율</p>
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
         <div className="text-xs text-gray-500 space-y-1">
-          <p>• 매매: 0.4~0.7% (거래금액별 차등)</p>
-          <p>• 전세/월세: 0.3~0.6%</p>
-          <p>• 상한 요율 내에서 협의 가능</p>
+          <p>• 중개보수 = 거래금액 × 요율 (한도 적용)</p>
+          <p>• 부가세 = 중개보수 × 10%</p>
+          <p>• 월세 환산액 = 보증금 + (월세 × 100)</p>
+          <p className="pl-3">※ 5천만원 미만: 보증금 + (월세 × 70)</p>
         </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">2021년 개정 주택 중개보수 요율</p>
+          <p>매매: 0.4~0.7% | 전세/월세: 0.3~0.6%</p>
+          <p>상한 요율 내에서 협의 가능</p>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">공인중개사법 시행규칙 기준</p>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { ageCalculator } from "@/lib/math/age-calculator";
+import { DatePicker } from "@/components/ui";
 
 export function AgeCalculator() {
   const [birthDate, setBirthDate] = useState<string>("1990-01-01");
@@ -20,11 +21,10 @@ export function AgeCalculator() {
       <div className="space-y-4 mb-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">생년월일</label>
-          <input
-            type="date"
+          <DatePicker
             value={birthDate}
-            onChange={(e) => setBirthDate(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+            onChange={setBirthDate}
+            placeholder="생년월일 선택"
           />
         </div>
       </div>
@@ -75,6 +75,15 @@ export function AgeCalculator() {
               <div className="text-lg font-semibold text-purple-700">
                 {result.constellation}
               </div>
+            </div>
+          </div>
+
+          <div className="p-4 bg-gray-50 rounded-xl">
+            <p className="text-sm font-medium text-gray-700 mb-2">계산 기준</p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>• 만 나이 = 현재연도 - 출생연도 (생일 지나면) 또는 -1 (안 지났으면)</p>
+              <p>• 한국 나이 = 현재연도 - 출생연도 + 1</p>
+              <p>• 2023년부터 공식 문서에서 만 나이 사용</p>
             </div>
           </div>
         </div>

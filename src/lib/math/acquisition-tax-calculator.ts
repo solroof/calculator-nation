@@ -81,7 +81,7 @@ export class AcquisitionTaxCalculator {
     isRegulatedArea: boolean,
     isFirstTimeBuyer: boolean
   ): number {
-    const { house, multiHouse, nonRegulatedMultiHouse } = ACQUISITION_TAX_2024;
+    const { multiHouse, nonRegulatedMultiHouse } = ACQUISITION_TAX_2024;
 
     // 생애 최초 주택 구매자 감면 (1.5억 이하 면제, 그 외 50% 감면)
     if (isFirstTimeBuyer && houseCount === 1) {

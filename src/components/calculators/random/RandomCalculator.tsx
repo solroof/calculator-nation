@@ -1,20 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 export function RandomCalculator() {
-  const [min, setMin] = useState("1");
-  const [max, setMax] = useState("100");
-  const [count, setCount] = useState("1");
+  const [min, setMin] = useState<number>(1);
+  const [max, setMax] = useState<number>(100);
+  const [count, setCount] = useState<number>(1);
   const [allowDuplicates, setAllowDuplicates] = useState(true);
   const [results, setResults] = useState<number[]>([]);
 
   const generateRandom = () => {
-    const minNum = parseInt(min);
-    const maxNum = parseInt(max);
-    const countNum = parseInt(count);
-
-    if (isNaN(minNum) || isNaN(maxNum) || isNaN(countNum)) return;
+    const minNum = min || 1;
+    const maxNum = max || 100;
+    const countNum = count || 1;
     if (minNum >= maxNum) return;
 
     const range = maxNum - minNum + 1;
@@ -23,7 +22,7 @@ export function RandomCalculator() {
       return;
     }
 
-    let newResults: number[] = [];
+    const newResults: number[] = [];
 
     if (allowDuplicates) {
       for (let i = 0; i < countNum; i++) {
@@ -65,9 +64,9 @@ export function RandomCalculator() {
             <button
               key={p.label}
               onClick={() => {
-                setMin(p.min.toString());
-                setMax(p.max.toString());
-                setCount(p.count.toString());
+                setMin(p.min);
+                setMax(p.max);
+                setCount(p.count);
                 setAllowDuplicates(p.dup);
               }}
               className="px-3 py-1.5 rounded-lg text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all"
@@ -82,33 +81,33 @@ export function RandomCalculator() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">최솟값</label>
-            <input
-              type="number"
+            <NumberInput
               value={min}
-              onChange={(e) => setMin(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-500"
+              onChange={setMin}
+              step={1}
+              format="comma"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">최댓값</label>
-            <input
-              type="number"
+            <NumberInput
               value={max}
-              onChange={(e) => setMax(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-500"
+              onChange={setMax}
+              step={1}
+              format="comma"
             />
           </div>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">개수</label>
-          <input
-            type="number"
+          <NumberInput
             value={count}
-            onChange={(e) => setCount(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gray-500"
-            min="1"
-            max="100"
+            onChange={setCount}
+            min={1}
+            max={100}
+            step={1}
+            format="none"
           />
         </div>
 
@@ -145,6 +144,15 @@ export function RandomCalculator() {
           </div>
         </div>
       )}
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">생성 방식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 난수 = min + floor(random × (max - min + 1))</p>
+          <p>• 중복 제외: Fisher-Yates 셔플 알고리즘 사용</p>
+          <p>• JavaScript Math.random() 기반 (균등 분포)</p>
+        </div>
+      </div>
     </div>
   );
 }

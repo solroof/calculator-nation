@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 
 export default function StockReturnPage() {
   return (
-    <div className="max-w-lg mx-auto px-4 py-6">
-      <section className="bg-white rounded-2xl border border-gray-200 p-4">
+    <div className="max-w-lg lg:max-w-3xl mx-auto px-4 py-6 lg:py-8">
+      <section className="bg-white rounded-2xl border border-gray-200 p-4 lg:p-6">
         <StockReturnCalculator />
       </section>
     </div>

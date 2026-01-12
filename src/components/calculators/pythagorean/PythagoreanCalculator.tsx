@@ -1,19 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 type CalcMode = "findC" | "findA" | "check";
 
 export function PythagoreanCalculator() {
   const [mode, setMode] = useState<CalcMode>("findC");
-  const [sideA, setSideA] = useState("3");
-  const [sideB, setSideB] = useState("4");
-  const [sideC, setSideC] = useState("5");
+  const [sideA, setSideA] = useState<number>(3);
+  const [sideB, setSideB] = useState<number>(4);
+  const [sideC, setSideC] = useState<number>(5);
 
   const calculate = () => {
-    const a = parseFloat(sideA) || 0;
-    const b = parseFloat(sideB) || 0;
-    const c = parseFloat(sideC) || 0;
+    const a = sideA || 0;
+    const b = sideB || 0;
+    const c = sideC || 0;
 
     switch (mode) {
       case "findC": {
@@ -114,37 +115,34 @@ export function PythagoreanCalculator() {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               a {mode === "findA" ? "(결과)" : ""}
             </label>
-            <input
-              type="number"
+            <NumberInput
               value={sideA}
-              onChange={(e) => setSideA(e.target.value)}
-              disabled={mode === "findA"}
-              className={`w-full px-3 py-2 border border-gray-200 rounded-xl text-center ${
-                mode === "findA" ? "bg-gray-100" : "focus:ring-2 focus:ring-indigo-500"
-              }`}
+              onChange={setSideA}
+              min={0}
+              step={1}
+              format="comma"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">b</label>
-            <input
-              type="number"
+            <NumberInput
               value={sideB}
-              onChange={(e) => setSideB(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-center"
+              onChange={setSideB}
+              min={0}
+              step={1}
+              format="comma"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               c (빗변) {mode === "findC" ? "(결과)" : ""}
             </label>
-            <input
-              type="number"
+            <NumberInput
               value={sideC}
-              onChange={(e) => setSideC(e.target.value)}
-              disabled={mode === "findC"}
-              className={`w-full px-3 py-2 border border-gray-200 rounded-xl text-center ${
-                mode === "findC" ? "bg-gray-100" : "focus:ring-2 focus:ring-indigo-500"
-              }`}
+              onChange={setSideC}
+              min={0}
+              step={1}
+              format="comma"
             />
           </div>
         </div>
@@ -197,6 +195,20 @@ export function PythagoreanCalculator() {
           <text x="190" y="85" textAnchor="middle" className="text-xs fill-gray-600">b</text>
           <text x="90" y="75" textAnchor="middle" className="text-xs fill-gray-600">c</text>
         </svg>
+      </div>
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">피타고라스 정리</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 기본 공식: a² + b² = c² (c는 빗변)</p>
+          <p>• 빗변 구하기: c = √(a² + b²)</p>
+          <p>• 밑변 구하기: a = √(c² - b²)</p>
+          <p>• 높이 구하기: b = √(c² - a²)</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">유명한 피타고라스 삼각형</p>
+          <p>3-4-5, 5-12-13, 8-15-17, 7-24-25</p>
+        </div>
       </div>
     </div>
   );

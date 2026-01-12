@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -147,28 +147,61 @@ const calculatorCategories = [
   },
 ];
 
+// 인기 계산기 (퀵 링크용)
+const popularItems = [
+  { name: "연봉 실수령액", href: "/salary" },
+  { name: "대출 이자", href: "/loan" },
+  { name: "BMI", href: "/bmi" },
+  { name: "D-Day", href: "/dday" },
+  { name: "환율", href: "/currency" },
+];
+
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const pathname = usePathname();
+  const megaMenuRef = useRef<HTMLDivElement>(null);
 
   const closeMenu = useCallback(() => {
     setIsMenuOpen(false);
   }, []);
 
+  const closeMegaMenu = useCallback(() => {
+    setIsMegaMenuOpen(false);
+  }, []);
+
   // ESC 키로 메뉴 닫기
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeMenu();
+      if (e.key === "Escape") {
+        closeMenu();
+        closeMegaMenu();
+      }
     };
+    document.addEventListener("keydown", handleEsc);
     if (isMenuOpen) {
-      document.addEventListener("keydown", handleEsc);
       document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
     }
     return () => {
       document.removeEventListener("keydown", handleEsc);
       document.body.style.overflow = "";
     };
-  }, [isMenuOpen, closeMenu]);
+  }, [isMenuOpen, closeMenu, closeMegaMenu]);
+
+  // 메가메뉴 외부 클릭 감지
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (megaMenuRef.current && !megaMenuRef.current.contains(e.target as Node)) {
+        closeMegaMenu();
+      }
+    };
+    if (isMegaMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isMegaMenuOpen, closeMegaMenu]);
 
   // 현재 페이지 타이틀 가져오기
   const getCurrentTitle = () => {
@@ -185,8 +218,8 @@ export function Header() {
     <>
       {/* 고정 헤더 */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md">
-        <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
-          {/* 햄버거 메뉴 버튼 */}
+        {/* 모바일 헤더 */}
+        <div className="lg:hidden max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
           <button
             onClick={() => setIsMenuOpen(true)}
             className="p-2 -ml-2 rounded-lg hover:bg-white/10 active:bg-white/20 transition-colors"
@@ -197,12 +230,10 @@ export function Header() {
             </svg>
           </button>
 
-          {/* 사이트 로고 / 페이지 타이틀 */}
           <Link href="/" className="text-lg font-bold">
             {isHome ? "계산기나라" : getCurrentTitle()}
           </Link>
 
-          {/* 홈 버튼 (서브 페이지에서만 표시) */}
           {!isHome ? (
             <Link
               href="/"
@@ -217,23 +248,98 @@ export function Header() {
             <div className="w-10"></div>
           )}
         </div>
+
+        {/* PC 헤더 */}
+        <div className="hidden lg:block" ref={megaMenuRef}>
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="h-14 flex items-center justify-between">
+              {/* 로고 */}
+              <Link href="/" className="text-xl font-bold hover:opacity-90 transition-opacity flex items-center gap-2">
+                <span className="text-2xl">🧮</span>
+                <span>계산기나라</span>
+              </Link>
+
+              {/* 중앙: 인기 퀵링크 */}
+              <nav className="flex items-center gap-6">
+                {popularItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`text-sm font-medium transition-colors ${
+                      pathname === item.href ? "text-white" : "text-white/70 hover:text-white"
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </nav>
+
+              {/* 전체 메뉴 버튼 */}
+              <button
+                onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isMegaMenuOpen ? "bg-white text-blue-600" : "bg-white/10 hover:bg-white/20"
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+                전체 메뉴
+              </button>
+            </div>
+          </div>
+
+          {/* 메가메뉴 */}
+          {isMegaMenuOpen && (
+            <div className="absolute top-full left-0 right-0 bg-white shadow-xl border-t">
+              <div className="max-w-7xl mx-auto px-6 py-6">
+                <div className="grid grid-cols-5 gap-6">
+                  {calculatorCategories.map((category) => (
+                    <div key={category.name}>
+                      <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                        <span>{category.icon}</span>
+                        <span>{category.name}</span>
+                      </h3>
+                      <ul className="space-y-1.5">
+                        {category.items.map((item) => (
+                          <li key={item.href}>
+                            <Link
+                              href={item.href}
+                              onClick={closeMegaMenu}
+                              className={`block text-sm transition-colors ${
+                                pathname === item.href
+                                  ? "text-blue-600 font-medium"
+                                  : "text-gray-600 hover:text-blue-600"
+                              }`}
+                            >
+                              {item.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </header>
 
-      {/* 오버레이 */}
+      {/* 모바일: 오버레이 */}
       {isMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-50 transition-opacity"
+          className="lg:hidden fixed inset-0 bg-black/50 z-50 transition-opacity"
           onClick={closeMenu}
         />
       )}
 
-      {/* 사이드 메뉴 */}
+      {/* 모바일: 사이드 메뉴 */}
       <aside
-        className={`fixed top-0 left-0 h-full w-72 bg-white z-50 transform transition-transform duration-300 ease-in-out shadow-xl ${
+        className={`lg:hidden fixed top-0 left-0 h-full w-72 bg-white z-50 transform transition-transform duration-300 ease-in-out shadow-xl ${
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        {/* 메뉴 헤더 */}
         <div className="h-14 px-4 flex items-center justify-between bg-gradient-to-r from-blue-500 to-blue-600 text-white">
           <span className="font-bold">계산기나라</span>
           <button
@@ -247,7 +353,6 @@ export function Header() {
           </button>
         </div>
 
-        {/* 홈 링크 */}
         <Link
           href="/"
           onClick={closeMenu}
@@ -261,7 +366,6 @@ export function Header() {
           <span className="font-medium">홈</span>
         </Link>
 
-        {/* 메뉴 내용 */}
         <nav className="p-4 overflow-y-auto h-[calc(100%-7rem)]">
           {calculatorCategories.map((category) => (
             <div key={category.name} className="mb-4">

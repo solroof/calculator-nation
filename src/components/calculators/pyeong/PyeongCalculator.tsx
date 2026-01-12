@@ -1,36 +1,26 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 const PYEONG_TO_SQM = 3.305785;
 
 export function PyeongCalculator() {
-  const [pyeong, setPyeong] = useState("");
-  const [sqm, setSqm] = useState("");
-  const [lastEdited, setLastEdited] = useState<"pyeong" | "sqm">("pyeong");
+  const [pyeong, setPyeong] = useState<number>(30);
+  const [sqm, setSqm] = useState<number>(99.17);
 
-  useEffect(() => {
-    if (lastEdited === "pyeong" && pyeong) {
-      const value = parseFloat(pyeong);
-      if (!isNaN(value)) {
-        setSqm((value * PYEONG_TO_SQM).toFixed(2));
-      }
-    } else if (lastEdited === "sqm" && sqm) {
-      const value = parseFloat(sqm);
-      if (!isNaN(value)) {
-        setPyeong((value / PYEONG_TO_SQM).toFixed(2));
-      }
-    }
-  }, [pyeong, sqm, lastEdited]);
-
-  const handlePyeongChange = (value: string) => {
+  const handlePyeongChange = (value: number) => {
     setPyeong(value);
-    setLastEdited("pyeong");
+    if (value > 0) {
+      setSqm(parseFloat((value * PYEONG_TO_SQM).toFixed(2)));
+    }
   };
 
-  const handleSqmChange = (value: string) => {
+  const handleSqmChange = (value: number) => {
     setSqm(value);
-    setLastEdited("sqm");
+    if (value > 0) {
+      setPyeong(parseFloat((value / PYEONG_TO_SQM).toFixed(2)));
+    }
   };
 
   const quickValues = [10, 20, 30, 40, 50, 60];
@@ -51,9 +41,9 @@ export function PyeongCalculator() {
           {quickValues.map((val) => (
             <button
               key={val}
-              onClick={() => handlePyeongChange(val.toString())}
+              onClick={() => handlePyeongChange(val)}
               className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
-                parseFloat(pyeong) === val
+                pyeong === val
                   ? "bg-emerald-500 text-white"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
@@ -67,16 +57,14 @@ export function PyeongCalculator() {
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">평</label>
-          <div className="relative">
-            <input
-              type="number"
-              value={pyeong}
-              onChange={(e) => handlePyeongChange(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-lg focus:ring-2 focus:ring-emerald-500"
-              placeholder="30"
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">평</span>
-          </div>
+          <NumberInput
+            value={pyeong}
+            onChange={handlePyeongChange}
+            min={0}
+            step={1}
+            format="comma"
+            suffix="평"
+          />
         </div>
 
         <div className="flex justify-center">
@@ -88,24 +76,22 @@ export function PyeongCalculator() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">제곱미터 (㎡)</label>
-          <div className="relative">
-            <input
-              type="number"
-              value={sqm}
-              onChange={(e) => handleSqmChange(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-lg focus:ring-2 focus:ring-emerald-500"
-              placeholder="99.17"
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">㎡</span>
-          </div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">제곱미터</label>
+          <NumberInput
+            value={sqm}
+            onChange={handleSqmChange}
+            min={0}
+            step={1}
+            format="comma"
+            suffix="㎡"
+          />
         </div>
       </div>
 
-      {(pyeong || sqm) && (
+      {(pyeong > 0 || sqm > 0) && (
         <div className="mt-6 bg-emerald-50 rounded-xl p-4">
           <p className="text-sm text-emerald-700">
-            <strong>{pyeong || "0"}평</strong>은 <strong>{sqm || "0"}㎡</strong>입니다.
+            <strong>{pyeong || 0}평</strong>은 <strong>{sqm || 0}㎡</strong>입니다.
           </p>
           <p className="text-xs text-emerald-600 mt-1">
             (1평 = {PYEONG_TO_SQM}㎡)
@@ -113,9 +99,18 @@ export function PyeongCalculator() {
         </div>
       )}
 
-      <div className="mt-4 text-xs text-gray-400">
-        <p>• 아파트 전용면적 기준</p>
-        <p>• 실제 면적은 공급면적과 다를 수 있음</p>
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 1평 = 3.305785㎡</p>
+          <p>• 평 → ㎡: 평수 × 3.305785</p>
+          <p>• ㎡ → 평: ㎡ ÷ 3.305785</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">참고</p>
+          <p>• 아파트 전용면적 기준</p>
+          <p>• 공급면적 = 전용면적 + 공용면적</p>
+        </div>
       </div>
     </div>
   );

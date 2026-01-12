@@ -663,9 +663,11 @@ export class TriangleSolver {
     a: number,
     b: number,
     c: number,
-    A: number,
+     
+    _A: number,
     B: number,
-    C: number
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _C: number
   ): Vertices {
     // B를 원점, C를 x축 양의 방향에 배치
     const Bx = 0,

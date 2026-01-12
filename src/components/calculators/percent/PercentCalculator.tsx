@@ -1,19 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { NumberInput } from "@/components/ui";
 
 type CalcMode = "whatPercent" | "percentOf" | "percentChange";
 
 export function PercentCalculator() {
   const [mode, setMode] = useState<CalcMode>("percentOf");
-  const [value1, setValue1] = useState("");
-  const [value2, setValue2] = useState("");
-  const [result, setResult] = useState<number | null>(null);
+  const [value1, setValue1] = useState<number>(10);
+  const [value2, setValue2] = useState<number>(200);
 
-  const calculate = () => {
-    const v1 = parseFloat(value1);
-    const v2 = parseFloat(value2);
-    if (isNaN(v1) || isNaN(v2)) return;
+  // 자동 계산
+  const result = useMemo(() => {
+    const v1 = value1 || 0;
+    const v2 = value2 || 0;
+    if (v1 === 0 && v2 === 0) {
+      return null;
+    }
 
     let res = 0;
     switch (mode) {
@@ -21,14 +24,20 @@ export function PercentCalculator() {
         res = (v1 / 100) * v2;
         break;
       case "whatPercent":
+        if (v2 === 0) {
+          return null;
+        }
         res = (v1 / v2) * 100;
         break;
       case "percentChange":
+        if (v1 === 0) {
+          return null;
+        }
         res = ((v2 - v1) / v1) * 100;
         break;
     }
-    setResult(res);
-  };
+    return res;
+  }, [value1, value2, mode]);
 
   const modes = [
     { id: "percentOf", label: "A%의 B는?", desc: "퍼센트 값 계산" },
@@ -50,7 +59,7 @@ export function PercentCalculator() {
         {modes.map((m) => (
           <button
             key={m.id}
-            onClick={() => { setMode(m.id as CalcMode); setResult(null); }}
+            onClick={() => setMode(m.id as CalcMode)}
             className={`px-3 py-2 rounded-lg text-sm whitespace-nowrap transition-all ${
               mode === m.id
                 ? "bg-violet-500 text-white"
@@ -66,21 +75,23 @@ export function PercentCalculator() {
         {mode === "percentOf" && (
           <>
             <div className="flex items-center gap-2">
-              <input
-                type="number"
-                value={value1}
-                onChange={(e) => setValue1(e.target.value)}
-                className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-center"
-                placeholder="10"
-              />
+              <div className="flex-1">
+                <NumberInput
+                  value={value1}
+                  onChange={setValue1}
+                  step={1}
+                  format="comma"
+                />
+              </div>
               <span className="text-gray-500 font-medium">% 의</span>
-              <input
-                type="number"
-                value={value2}
-                onChange={(e) => setValue2(e.target.value)}
-                className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-center"
-                placeholder="200"
-              />
+              <div className="flex-1">
+                <NumberInput
+                  value={value2}
+                  onChange={setValue2}
+                  step={1}
+                  format="comma"
+                />
+              </div>
             </div>
           </>
         )}
@@ -88,21 +99,23 @@ export function PercentCalculator() {
         {mode === "whatPercent" && (
           <>
             <div className="flex items-center gap-2">
-              <input
-                type="number"
-                value={value1}
-                onChange={(e) => setValue1(e.target.value)}
-                className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-center"
-                placeholder="25"
-              />
+              <div className="flex-1">
+                <NumberInput
+                  value={value1}
+                  onChange={setValue1}
+                  step={1}
+                  format="comma"
+                />
+              </div>
               <span className="text-gray-500 font-medium">는</span>
-              <input
-                type="number"
-                value={value2}
-                onChange={(e) => setValue2(e.target.value)}
-                className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-center"
-                placeholder="100"
-              />
+              <div className="flex-1">
+                <NumberInput
+                  value={value2}
+                  onChange={setValue2}
+                  step={1}
+                  format="comma"
+                />
+              </div>
               <span className="text-gray-500 font-medium">의 몇%?</span>
             </div>
           </>
@@ -111,32 +124,27 @@ export function PercentCalculator() {
         {mode === "percentChange" && (
           <>
             <div className="flex items-center gap-2">
-              <input
-                type="number"
-                value={value1}
-                onChange={(e) => setValue1(e.target.value)}
-                className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-center"
-                placeholder="이전 값"
-              />
+              <div className="flex-1">
+                <NumberInput
+                  value={value1}
+                  onChange={setValue1}
+                  step={1}
+                  format="comma"
+                />
+              </div>
               <span className="text-gray-500 font-medium">→</span>
-              <input
-                type="number"
-                value={value2}
-                onChange={(e) => setValue2(e.target.value)}
-                className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-center"
-                placeholder="이후 값"
-              />
+              <div className="flex-1">
+                <NumberInput
+                  value={value2}
+                  onChange={setValue2}
+                  step={1}
+                  format="comma"
+                />
+              </div>
             </div>
           </>
         )}
       </div>
-
-      <button
-        onClick={calculate}
-        className="w-full py-3.5 rounded-xl font-medium bg-violet-500 text-white active:bg-violet-600 shadow-sm transition-all mb-4"
-      >
-        계산하기
-      </button>
 
       {result !== null && (
         <div className="bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl p-5 text-white">
@@ -153,6 +161,15 @@ export function PercentCalculator() {
           )}
         </div>
       )}
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• A%의 B = B × (A / 100)</p>
+          <p>• A는 B의 몇% = (A / B) × 100</p>
+          <p>• A→B 변화율 = (B - A) / A × 100</p>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,15 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 export function LogarithmCalculator() {
   const [mode, setMode] = useState<"log" | "ln" | "logBase">("log");
-  const [value, setValue] = useState("100");
-  const [base, setBase] = useState("2");
+  const [value, setValue] = useState<number>(100);
+  const [base, setBase] = useState<number>(2);
 
   const calculate = () => {
-    const x = parseFloat(value) || 0;
-    const b = parseFloat(base) || 10;
+    const x = value || 0;
+    const b = base || 10;
 
     if (x <= 0) return { result: NaN, valid: false, message: "양수만 가능" };
     if (mode === "logBase" && (b <= 0 || b === 1)) {
@@ -43,7 +44,7 @@ export function LogarithmCalculator() {
   const result = calculate();
 
   // 추가 정보 계산
-  const x = parseFloat(value) || 0;
+  const x = value || 0;
   const additionalInfo = x > 0 ? {
     log10: Math.log10(x),
     ln: Math.log(x),
@@ -97,24 +98,24 @@ export function LogarithmCalculator() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">값 (x)</label>
-          <input
-            type="number"
+          <NumberInput
             value={value}
-            onChange={(e) => setValue(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-lg"
-            placeholder="100"
+            onChange={setValue}
+            min={0}
+            step={1}
+            format="comma"
           />
         </div>
 
         {mode === "logBase" && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">밑 (base)</label>
-            <input
-              type="number"
+            <NumberInput
               value={base}
-              onChange={(e) => setBase(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500"
-              placeholder="2"
+              onChange={setBase}
+              min={0}
+              step={1}
+              format="none"
             />
           </div>
         )}

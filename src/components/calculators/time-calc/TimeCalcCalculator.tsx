@@ -1,25 +1,26 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 type CalcMode = "add" | "diff" | "convert";
 
 export function TimeCalcCalculator() {
   const [mode, setMode] = useState<CalcMode>("add");
-  const [hours1, setHours1] = useState("9");
-  const [minutes1, setMinutes1] = useState("0");
-  const [hours2, setHours2] = useState("18");
-  const [minutes2, setMinutes2] = useState("30");
-  const [addHours, setAddHours] = useState("2");
-  const [addMinutes, setAddMinutes] = useState("30");
+  const [hours1, setHours1] = useState<number>(9);
+  const [minutes1, setMinutes1] = useState<number>(0);
+  const [hours2, setHours2] = useState<number>(18);
+  const [minutes2, setMinutes2] = useState<number>(30);
+  const [addHours, setAddHours] = useState<number>(2);
+  const [addMinutes, setAddMinutes] = useState<number>(30);
   const [operation, setOperation] = useState<"add" | "subtract">("add");
-  const [totalMinutes, setTotalMinutes] = useState("90");
+  const [totalMinutes, setTotalMinutes] = useState<number>(90);
 
   const calculateAdd = () => {
-    const h = parseInt(hours1) || 0;
-    const m = parseInt(minutes1) || 0;
-    const addH = parseInt(addHours) || 0;
-    const addM = parseInt(addMinutes) || 0;
+    const h = hours1 || 0;
+    const m = minutes1 || 0;
+    const addH = addHours || 0;
+    const addM = addMinutes || 0;
 
     let totalMins = h * 60 + m;
     if (operation === "add") {
@@ -41,10 +42,10 @@ export function TimeCalcCalculator() {
   };
 
   const calculateDiff = () => {
-    const h1 = parseInt(hours1) || 0;
-    const m1 = parseInt(minutes1) || 0;
-    const h2 = parseInt(hours2) || 0;
-    const m2 = parseInt(minutes2) || 0;
+    const h1 = hours1 || 0;
+    const m1 = minutes1 || 0;
+    const h2 = hours2 || 0;
+    const m2 = minutes2 || 0;
 
     const total1 = h1 * 60 + m1;
     const total2 = h2 * 60 + m2;
@@ -62,7 +63,7 @@ export function TimeCalcCalculator() {
   };
 
   const calculateConvert = () => {
-    const mins = parseInt(totalMinutes) || 0;
+    const mins = totalMinutes || 0;
 
     return {
       hours: Math.floor(mins / 60),
@@ -129,28 +130,24 @@ export function TimeCalcCalculator() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">기준 시간</label>
               <div className="grid grid-cols-2 gap-2">
-                <div className="relative">
-                  <input
-                    type="number"
-                    value={hours1}
-                    onChange={(e) => setHours1(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500"
-                    min="0"
-                    max="23"
-                  />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">시</span>
-                </div>
-                <div className="relative">
-                  <input
-                    type="number"
-                    value={minutes1}
-                    onChange={(e) => setMinutes1(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500"
-                    min="0"
-                    max="59"
-                  />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">분</span>
-                </div>
+                <NumberInput
+                  value={hours1}
+                  onChange={setHours1}
+                  min={0}
+                  max={23}
+                  step={1}
+                  format="none"
+                  suffix="시"
+                />
+                <NumberInput
+                  value={minutes1}
+                  onChange={setMinutes1}
+                  min={0}
+                  max={59}
+                  step={1}
+                  format="none"
+                  suffix="분"
+                />
               </div>
             </div>
 
@@ -174,26 +171,22 @@ export function TimeCalcCalculator() {
             </div>
 
             <div className="grid grid-cols-2 gap-2">
-              <div className="relative">
-                <input
-                  type="number"
-                  value={addHours}
-                  onChange={(e) => setAddHours(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500"
-                  min="0"
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">시간</span>
-              </div>
-              <div className="relative">
-                <input
-                  type="number"
-                  value={addMinutes}
-                  onChange={(e) => setAddMinutes(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500"
-                  min="0"
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">분</span>
-              </div>
+              <NumberInput
+                value={addHours}
+                onChange={setAddHours}
+                min={0}
+                step={1}
+                format="none"
+                suffix="시간"
+              />
+              <NumberInput
+                value={addMinutes}
+                onChange={setAddMinutes}
+                min={0}
+                step={1}
+                format="none"
+                suffix="분"
+              />
             </div>
           </>
         )}
@@ -203,55 +196,47 @@ export function TimeCalcCalculator() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">시작 시간</label>
               <div className="grid grid-cols-2 gap-2">
-                <div className="relative">
-                  <input
-                    type="number"
-                    value={hours1}
-                    onChange={(e) => setHours1(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500"
-                    min="0"
-                    max="23"
-                  />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">시</span>
-                </div>
-                <div className="relative">
-                  <input
-                    type="number"
-                    value={minutes1}
-                    onChange={(e) => setMinutes1(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500"
-                    min="0"
-                    max="59"
-                  />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">분</span>
-                </div>
+                <NumberInput
+                  value={hours1}
+                  onChange={setHours1}
+                  min={0}
+                  max={23}
+                  step={1}
+                  format="none"
+                  suffix="시"
+                />
+                <NumberInput
+                  value={minutes1}
+                  onChange={setMinutes1}
+                  min={0}
+                  max={59}
+                  step={1}
+                  format="none"
+                  suffix="분"
+                />
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">종료 시간</label>
               <div className="grid grid-cols-2 gap-2">
-                <div className="relative">
-                  <input
-                    type="number"
-                    value={hours2}
-                    onChange={(e) => setHours2(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500"
-                    min="0"
-                    max="23"
-                  />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">시</span>
-                </div>
-                <div className="relative">
-                  <input
-                    type="number"
-                    value={minutes2}
-                    onChange={(e) => setMinutes2(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500"
-                    min="0"
-                    max="59"
-                  />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">분</span>
-                </div>
+                <NumberInput
+                  value={hours2}
+                  onChange={setHours2}
+                  min={0}
+                  max={23}
+                  step={1}
+                  format="none"
+                  suffix="시"
+                />
+                <NumberInput
+                  value={minutes2}
+                  onChange={setMinutes2}
+                  min={0}
+                  max={59}
+                  step={1}
+                  format="none"
+                  suffix="분"
+                />
               </div>
             </div>
           </>
@@ -260,13 +245,13 @@ export function TimeCalcCalculator() {
         {mode === "convert" && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">분 입력</label>
-            <input
-              type="number"
+            <NumberInput
               value={totalMinutes}
-              onChange={(e) => setTotalMinutes(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 text-lg"
-              placeholder="분 단위로 입력"
-              min="0"
+              onChange={setTotalMinutes}
+              min={0}
+              step={1}
+              format="comma"
+              suffix="분"
             />
           </div>
         )}
@@ -335,6 +320,16 @@ export function TimeCalcCalculator() {
           })()}
         </div>
       )}
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 시간 → 분: 시간 × 60 + 분</p>
+          <p>• 분 → 시간: 분 ÷ 60 (몫: 시간, 나머지: 분)</p>
+          <p>• 분 → 초: 분 × 60</p>
+          <p>• 분 → 일: 분 ÷ 60 ÷ 24</p>
+        </div>
+      </div>
     </div>
   );
 }

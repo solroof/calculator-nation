@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { acquisitionTaxCalculator } from "@/lib/math/acquisition-tax-calculator";
 import type { AcquisitionTaxInput, PropertyType, HouseCount } from "@/lib/types/acquisition-tax";
+import { MoneyInput, NumberInput } from "@/components/ui";
 
 const propertyTypes: { value: PropertyType; label: string }[] = [
   { value: "apartment", label: "아파트" },
@@ -14,16 +15,16 @@ const propertyTypes: { value: PropertyType; label: string }[] = [
 
 export function AcquisitionTaxCalculator() {
   const [propertyType, setPropertyType] = useState<PropertyType>("apartment");
-  const [acquisitionPrice, setAcquisitionPrice] = useState<string>("500000000");
+  const [acquisitionPrice, setAcquisitionPrice] = useState<number>(500000000);
   const [houseCount, setHouseCount] = useState<HouseCount>(1);
   const [isRegulatedArea, setIsRegulatedArea] = useState<boolean>(false);
   const [isFirstTimeBuyer, setIsFirstTimeBuyer] = useState<boolean>(false);
-  const [area, setArea] = useState<string>("84");
+  const [area, setArea] = useState<number>(84);
 
   const isHousing = propertyType === "house" || propertyType === "apartment";
 
   const result = useMemo(() => {
-    const price = parseInt(acquisitionPrice) || 0;
+    const price = acquisitionPrice || 0;
     if (price <= 0) return null;
 
     const input: AcquisitionTaxInput = {
@@ -32,7 +33,7 @@ export function AcquisitionTaxCalculator() {
       houseCount: isHousing ? houseCount : undefined,
       isRegulatedArea: isHousing ? isRegulatedArea : undefined,
       isFirstTimeBuyer: isHousing && houseCount === 1 ? isFirstTimeBuyer : undefined,
-      area: isHousing ? (parseInt(area) || 84) : undefined,
+      area: isHousing ? (area || 84) : undefined,
     };
 
     return acquisitionTaxCalculator.calculate(input);
@@ -83,19 +84,17 @@ export function AcquisitionTaxCalculator() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             취득가액
           </label>
-          <input
-            type="text"
-            inputMode="numeric"
+          <MoneyInput
             value={acquisitionPrice}
-            onChange={(e) => setAcquisitionPrice(e.target.value.replace(/[^0-9]/g, ""))}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-right text-lg"
-            placeholder="500,000,000"
+            onChange={setAcquisitionPrice}
+            min={0}
+            step={100000000}
           />
           <div className="flex flex-wrap gap-2 mt-2">
             {quickPrices.map((price) => (
               <button
                 key={price}
-                onClick={() => setAcquisitionPrice(price.toString())}
+                onClick={() => setAcquisitionPrice(price)}
                 className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-blue-100 text-gray-600 hover:text-blue-600 rounded-full transition-colors"
               >
                 {formatCurrency(price / 100000000)}억
@@ -134,13 +133,14 @@ export function AcquisitionTaxCalculator() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 전용면적 (㎡)
               </label>
-              <input
-                type="text"
-                inputMode="numeric"
+              <NumberInput
                 value={area}
-                onChange={(e) => setArea(e.target.value.replace(/[^0-9]/g, ""))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-right text-lg"
-                placeholder="84"
+                onChange={setArea}
+                min={10}
+                max={500}
+                step={1}
+                format="none"
+                suffix="㎡"
               />
               <p className="text-xs text-gray-500 mt-1">
                 85㎡ 초과 시 농어촌특별세 2% 추가
@@ -222,11 +222,21 @@ export function AcquisitionTaxCalculator() {
             </div>
           </div>
 
-          {/* 안내 문구 */}
-          <div className="text-xs text-gray-500 space-y-1">
-            <p>* 2024년 취득세 기준으로 계산됩니다.</p>
-            <p>* 실제 세금은 지역, 감면 조건 등에 따라 달라질 수 있습니다.</p>
-            <p>* 정확한 금액은 관할 세무서에 문의하세요.</p>
+          {/* 계산 공식 */}
+          <div className="bg-gray-50 rounded-lg p-4">
+            <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>• 취득세 = 취득가액 × 취득세율</p>
+              <p>• 지방교육세 = 취득세 × 10% (취득세 2% 초과분)</p>
+              <p>• 농어촌특별세 = 취득가액 × 0.2% (85㎡ 초과 시)</p>
+              <p>• 총 세금 = 취득세 + 지방교육세 + 농어촌특별세</p>
+            </div>
+            <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+              <p className="font-medium mb-1">주택 취득세율</p>
+              <p>• 6억 이하: 1%, 6~9억: 1~3%, 9억 초과: 3%</p>
+              <p>• 다주택(조정지역): 2주택 8%, 3주택+ 12%</p>
+            </div>
+            <p className="text-xs text-gray-400 mt-2">2024년 지방세법 기준</p>
           </div>
         </div>
       )}

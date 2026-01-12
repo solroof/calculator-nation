@@ -84,7 +84,7 @@ export function UnitPriceCalculator() {
       </div>
 
       <div className="space-y-3 mb-4">
-        {items.map((item, idx) => (
+        {items.map((item) => (
           <div key={item.id} className="p-3 bg-gray-50 rounded-xl">
             <div className="flex items-center justify-between mb-2">
               <input
@@ -191,6 +191,19 @@ export function UnitPriceCalculator() {
           ))}
         </div>
       )}
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 단가 = (가격 ÷ 용량) × 기준단위</p>
+          <p>• 비교 = (단가A - 단가B) ÷ 단가B × 100%</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">예시</p>
+          <p>• 5,000원/500g → 100g당 1,000원</p>
+          <p>• 8,000원/1kg → 100g당 800원 (더 저렴)</p>
+        </div>
+      </div>
     </div>
   );
 }

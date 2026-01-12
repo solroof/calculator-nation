@@ -251,11 +251,20 @@ export function RentConversionCalculator() {
             </div>
           )}
 
-          {/* 안내 문구 */}
-          <div className="text-xs text-gray-500 space-y-1">
-            <p>* 법정 전환율 = 한국은행 기준금리 + 2%</p>
-            <p>* 2024년 기준금리: 3.5%</p>
-            <p>* 실제 계약 시 임대인과 협의가 필요합니다.</p>
+          {/* 계산 공식 */}
+          <div className="p-4 bg-gray-50 rounded-xl">
+            <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>• 월세 = 전환금액 × 전환율 ÷ 12</p>
+              <p>• 전세금 = 월세 × 12 ÷ 전환율</p>
+              <p>• 법정 전환율 = 기준금리 + 2%</p>
+            </div>
+            <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+              <p className="font-medium mb-1">2024년 기준</p>
+              <p>• 한국은행 기준금리: 3.5%</p>
+              <p>• 법정 전환율: 5.5% (상한 10%)</p>
+              <p>• 실제 계약 시 임대인과 협의 필요</p>
+            </div>
           </div>
         </div>
       )}

@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 export function ConeCalculator() {
-  const [radius, setRadius] = useState("5");
-  const [height, setHeight] = useState("10");
+  const [radius, setRadius] = useState<number>(5);
+  const [height, setHeight] = useState<number>(10);
 
-  const r = parseFloat(radius) || 0;
-  const h = parseFloat(height) || 0;
+  const r = radius || 0;
+  const h = height || 0;
 
   const slantHeight = Math.sqrt(r * r + h * h);
   const baseArea = Math.PI * r * r;
@@ -30,22 +31,22 @@ export function ConeCalculator() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">밑면 반지름 (r)</label>
-            <input
-              type="number"
+            <NumberInput
               value={radius}
-              onChange={(e) => setRadius(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 text-lg"
-              placeholder="5"
+              onChange={setRadius}
+              min={0}
+              step={1}
+              format="comma"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">높이 (h)</label>
-            <input
-              type="number"
+            <NumberInput
               value={height}
-              onChange={(e) => setHeight(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 text-lg"
-              placeholder="10"
+              onChange={setHeight}
+              min={0}
+              step={1}
+              format="comma"
             />
           </div>
         </div>
@@ -86,6 +87,18 @@ export function ConeCalculator() {
         <div className="flex justify-between p-3 bg-gray-50 rounded-xl">
           <span className="text-gray-600">밑면 둘레</span>
           <span className="font-medium">{(2 * Math.PI * r).toFixed(4)}</span>
+        </div>
+      </div>
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 부피 (V) = (1/3)πr²h</p>
+          <p>• 겉넓이 (S) = πr² + πrl (밑면 + 옆면)</p>
+          <p>• 옆면 넓이 = πrl (l: 모선)</p>
+          <p>• 밑면 넓이 = πr²</p>
+          <p>• 모선 길이 (l) = √(r² + h²)</p>
+          <p>• 밑면 둘레 = 2πr</p>
         </div>
       </div>
     </div>

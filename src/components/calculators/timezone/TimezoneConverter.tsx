@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const timezones = [
   { key: "KST", name: "한국 (서울)", offset: 9 },
@@ -27,12 +27,7 @@ export function TimezoneConverter() {
   const [fromZone, setFromZone] = useState("KST");
   const [hours, setHours] = useState("12");
   const [minutes, setMinutes] = useState("00");
-  const [date, setDate] = useState("");
-
-  useEffect(() => {
-    const now = new Date();
-    setDate(now.toISOString().split("T")[0]);
-  }, []);
+  useState(() => new Date().toISOString().split("T")[0]);
 
   const convert = (targetOffset: number) => {
     const fromOffset = timezones.find((tz) => tz.key === fromZone)?.offset || 9;

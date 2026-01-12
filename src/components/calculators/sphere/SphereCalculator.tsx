@@ -1,29 +1,29 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 type CalcMode = "radius" | "diameter" | "volume" | "surfaceArea";
 
 export function SphereCalculator() {
   const [mode, setMode] = useState<CalcMode>("radius");
-  const [value, setValue] = useState("5");
+  const [value, setValue] = useState<number>(5);
 
   const calculate = () => {
-    const v = parseFloat(value) || 0;
     let radius = 0;
 
     switch (mode) {
       case "radius":
-        radius = v;
+        radius = value;
         break;
       case "diameter":
-        radius = v / 2;
+        radius = value / 2;
         break;
       case "volume":
-        radius = Math.cbrt((3 * v) / (4 * Math.PI));
+        radius = Math.cbrt((3 * value) / (4 * Math.PI));
         break;
       case "surfaceArea":
-        radius = Math.sqrt(v / (4 * Math.PI));
+        radius = Math.sqrt(value / (4 * Math.PI));
         break;
     }
 
@@ -82,12 +82,12 @@ export function SphereCalculator() {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {modes.find((m) => m.key === mode)?.label} 입력
           </label>
-          <input
-            type="number"
+          <NumberInput
             value={value}
-            onChange={(e) => setValue(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-lg"
-            placeholder="5"
+            onChange={setValue}
+            min={0}
+            step={1}
+            format="comma"
           />
         </div>
       </div>
@@ -119,6 +119,17 @@ export function SphereCalculator() {
             <p className="text-xs text-gray-400">S = 4πr²</p>
           </div>
           <p className="text-lg font-bold text-indigo-600">{result.surfaceArea.toFixed(4)}</p>
+        </div>
+      </div>
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 부피: V = (4/3)πr³</p>
+          <p>• 겉넓이: S = 4πr²</p>
+          <p>• 지름: d = 2r</p>
+          <p>• 부피에서 반지름: r = ∛(3V/4π)</p>
+          <p>• 겉넓이에서 반지름: r = √(S/4π)</p>
         </div>
       </div>
     </div>

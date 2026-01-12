@@ -1,49 +1,46 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 type ShapeType = "rectangle" | "square" | "parallelogram" | "trapezoid";
 
 export function RectangleCalculator() {
   const [shapeType, setShapeType] = useState<ShapeType>("rectangle");
-  const [width, setWidth] = useState("10");
-  const [height, setHeight] = useState("5");
-  const [topWidth, setTopWidth] = useState("6"); // 사다리꼴 윗변
+  const [width, setWidth] = useState<number>(10);
+  const [height, setHeight] = useState<number>(5);
+  const [topWidth, setTopWidth] = useState<number>(6);
 
   const calculate = () => {
-    const w = parseFloat(width);
-    const h = parseFloat(height);
-    const top = parseFloat(topWidth);
-
-    if (isNaN(w) || w <= 0) return null;
+    if (width <= 0) return null;
 
     switch (shapeType) {
       case "square":
         return {
-          area: w * w,
-          perimeter: 4 * w,
-          description: `한 변: ${w}`,
+          area: width * width,
+          perimeter: 4 * width,
+          description: `한 변: ${width}`,
         };
       case "rectangle":
-        if (isNaN(h) || h <= 0) return null;
+        if (height <= 0) return null;
         return {
-          area: w * h,
-          perimeter: 2 * (w + h),
-          description: `가로: ${w}, 세로: ${h}`,
+          area: width * height,
+          perimeter: 2 * (width + height),
+          description: `가로: ${width}, 세로: ${height}`,
         };
       case "parallelogram":
-        if (isNaN(h) || h <= 0) return null;
+        if (height <= 0) return null;
         return {
-          area: w * h,
-          perimeter: null, // 빗변 길이 필요
-          description: `밑변: ${w}, 높이: ${h}`,
+          area: width * height,
+          perimeter: null,
+          description: `밑변: ${width}, 높이: ${height}`,
         };
       case "trapezoid":
-        if (isNaN(h) || h <= 0 || isNaN(top) || top <= 0) return null;
+        if (height <= 0 || topWidth <= 0) return null;
         return {
-          area: ((w + top) * h) / 2,
-          perimeter: null, // 빗변 길이 필요
-          description: `윗변: ${top}, 아랫변: ${w}, 높이: ${h}`,
+          area: ((width + topWidth) * height) / 2,
+          perimeter: null,
+          description: `윗변: ${topWidth}, 아랫변: ${width}, 높이: ${height}`,
         };
       default:
         return null;
@@ -93,13 +90,12 @@ export function RectangleCalculator() {
         {shapeType === "square" ? (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">한 변의 길이</label>
-            <input
-              type="number"
+            <NumberInput
               value={width}
-              onChange={(e) => setWidth(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-lg"
-              placeholder="한 변의 길이"
-              min="0"
+              onChange={setWidth}
+              min={0}
+              step={1}
+              format="comma"
             />
           </div>
         ) : (
@@ -107,13 +103,12 @@ export function RectangleCalculator() {
             {shapeType === "trapezoid" && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">윗변</label>
-                <input
-                  type="number"
+                <NumberInput
                   value={topWidth}
-                  onChange={(e) => setTopWidth(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-lg"
-                  placeholder="윗변"
-                  min="0"
+                  onChange={setTopWidth}
+                  min={0}
+                  step={1}
+                  format="comma"
                 />
               </div>
             )}
@@ -122,24 +117,24 @@ export function RectangleCalculator() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   {shapeType === "trapezoid" ? "아랫변" : shapeType === "parallelogram" ? "밑변" : "가로"}
                 </label>
-                <input
-                  type="number"
+                <NumberInput
                   value={width}
-                  onChange={(e) => setWidth(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-lg"
-                  min="0"
+                  onChange={setWidth}
+                  min={0}
+                  step={1}
+                  format="comma"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   {shapeType === "rectangle" ? "세로" : "높이"}
                 </label>
-                <input
-                  type="number"
+                <NumberInput
                   value={height}
-                  onChange={(e) => setHeight(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-lg"
-                  min="0"
+                  onChange={setHeight}
+                  min={0}
+                  step={1}
+                  format="comma"
                 />
               </div>
             </div>

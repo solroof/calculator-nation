@@ -58,7 +58,7 @@ export function ShapeDividerCalculator() {
   const [polygonPoints, setPolygonPoints] = useState<string>('0,0;3,3;6,0');
 
   // 옵션
-  const [useHeight, setUseHeight] = useState(true);
+  const [useHeight] = useState(true);
   const [useMirror, setUseMirror] = useState(false);
   const [clampNegative, setClampNegative] = useState(true);
 
@@ -562,9 +562,22 @@ export function ShapeDividerCalculator() {
         </div>
       )}
 
-      {/* Footer */}
-      <div className="mt-6 py-4 text-center text-gray-400 text-xs border-t border-gray-100">
-        <p>형상 함수 · 선형 보간 · 등간격 분할</p>
+      {/* 계산 공식 */}
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 등분: 간격 s = L ÷ n</p>
+          <p>• 간격 지정: 분할 수 n = floor(L ÷ s)</p>
+          <p>• 직사각형: h(x) = H</p>
+          <p>• 삼각형: h(x) = mx + b</p>
+          <p>• 원호: h(x) = yc + √(R² - (x-xc)²)</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">결과값</p>
+          <p>• dh: 이전 점과의 높이 차이</p>
+          <p>• theta: 경사각 = atan(dh/s)</p>
+          <p>• slope%: 경사도 = (dh/s) × 100</p>
+        </div>
       </div>
     </div>
   );

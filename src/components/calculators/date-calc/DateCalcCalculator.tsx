@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DatePicker } from "@/components/ui";
 
 type CalcMode = "add" | "diff";
 
@@ -111,11 +112,10 @@ export function DateCalcCalculator() {
           <>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">기준 날짜</label>
-              <input
-                type="date"
+              <DatePicker
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500"
+                onChange={setStartDate}
+                placeholder="날짜 선택"
               />
             </div>
 
@@ -179,20 +179,18 @@ export function DateCalcCalculator() {
           <>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">시작 날짜</label>
-              <input
-                type="date"
+              <DatePicker
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500"
+                onChange={setStartDate}
+                placeholder="시작 날짜 선택"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">종료 날짜</label>
-              <input
-                type="date"
+              <DatePicker
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500"
+                onChange={setEndDate}
+                placeholder="종료 날짜 선택"
               />
             </div>
           </>
@@ -231,6 +229,16 @@ export function DateCalcCalculator() {
           )}
         </div>
       )}
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 일수 차이 = (종료일 - 시작일) ÷ 86400000ms</p>
+          <p>• 주 = 일수 ÷ 7</p>
+          <p>• 년 = 일수 ÷ 365 (근사값)</p>
+          <p>• 개월 = (일수 % 365) ÷ 30 (근사값)</p>
+        </div>
+      </div>
     </div>
   );
 }

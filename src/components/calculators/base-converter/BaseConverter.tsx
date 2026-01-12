@@ -1,14 +1,27 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 type Base = "2" | "8" | "10" | "16";
 
+const getInitialValues = (decimal: string) => {
+  const num = parseInt(decimal, 10);
+  if (isNaN(num) || num < 0) {
+    return { binary: "", octal: "", hex: "" };
+  }
+  return {
+    binary: num.toString(2),
+    octal: num.toString(8),
+    hex: num.toString(16).toUpperCase(),
+  };
+};
+
 export function BaseConverter() {
   const [decimal, setDecimal] = useState("255");
-  const [binary, setBinary] = useState("");
-  const [octal, setOctal] = useState("");
-  const [hex, setHex] = useState("");
+  const initialValues = getInitialValues("255");
+  const [binary, setBinary] = useState(initialValues.binary);
+  const [octal, setOctal] = useState(initialValues.octal);
+  const [hex, setHex] = useState(initialValues.hex);
   const [activeInput, setActiveInput] = useState<Base>("10");
 
   const updateFromDecimal = (value: string) => {
@@ -65,10 +78,6 @@ export function BaseConverter() {
     setBinary(num.toString(2));
     setOctal(num.toString(8));
   };
-
-  useEffect(() => {
-    updateFromDecimal(decimal);
-  }, []);
 
   const handleChange = (base: Base, value: string) => {
     setActiveInput(base);

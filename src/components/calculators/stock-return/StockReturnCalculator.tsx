@@ -1,25 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import { MoneyInput, PercentInput, NumberInput } from "@/components/ui";
 
 export function StockReturnCalculator() {
-  const [buyPrice, setBuyPrice] = useState("50000");
-  const [sellPrice, setSellPrice] = useState("65000");
-  const [quantity, setQuantity] = useState("10");
-  const [buyFee, setBuyFee] = useState("0.015");
-  const [sellFee, setSellFee] = useState("0.015");
-  const [tax, setTax] = useState("0.23");
+  const [buyPrice, setBuyPrice] = useState<number>(50000);
+  const [sellPrice, setSellPrice] = useState<number>(65000);
+  const [quantity, setQuantity] = useState<number>(10);
+  const [buyFee, setBuyFee] = useState<number>(0.015);
+  const [sellFee, setSellFee] = useState<number>(0.015);
+  const [tax, setTax] = useState<number>(0.23);
 
   const calculate = () => {
-    const buy = parseFloat(buyPrice) || 0;
-    const sell = parseFloat(sellPrice) || 0;
-    const qty = parseInt(quantity) || 0;
-    const buyFeeRate = parseFloat(buyFee) / 100;
-    const sellFeeRate = parseFloat(sellFee) / 100;
-    const taxRate = parseFloat(tax) / 100;
+    const buyFeeRate = buyFee / 100;
+    const sellFeeRate = sellFee / 100;
+    const taxRate = tax / 100;
 
-    const totalBuy = buy * qty;
-    const totalSell = sell * qty;
+    const totalBuy = buyPrice * quantity;
+    const totalSell = sellPrice * quantity;
     const buyFeeAmount = totalBuy * buyFeeRate;
     const sellFeeAmount = totalSell * sellFeeRate;
     const taxAmount = totalSell * taxRate;
@@ -57,67 +55,63 @@ export function StockReturnCalculator() {
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">매수가 (원)</label>
-            <input
-              type="number"
+            <label className="block text-sm font-medium text-gray-700 mb-1">매수가</label>
+            <MoneyInput
               value={buyPrice}
-              onChange={(e) => setBuyPrice(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
-              placeholder="50000"
+              onChange={setBuyPrice}
+              step={1000}
+              placeholder="매수가 입력"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">매도가 (원)</label>
-            <input
-              type="number"
+            <label className="block text-sm font-medium text-gray-700 mb-1">매도가</label>
+            <MoneyInput
               value={sellPrice}
-              onChange={(e) => setSellPrice(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
-              placeholder="65000"
+              onChange={setSellPrice}
+              step={1000}
+              placeholder="매도가 입력"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">수량 (주)</label>
-          <input
-            type="number"
+          <label className="block text-sm font-medium text-gray-700 mb-1">수량</label>
+          <NumberInput
             value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
-            placeholder="10"
+            onChange={setQuantity}
+            min={1}
+            step={1}
+            format="comma"
+            suffix="주"
           />
         </div>
 
         <div className="grid grid-cols-3 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">매수 수수료 (%)</label>
-            <input
-              type="number"
-              step="0.001"
+            <label className="block text-sm font-medium text-gray-700 mb-1">매수 수수료</label>
+            <PercentInput
               value={buyFee}
-              onChange={(e) => setBuyFee(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm"
+              onChange={setBuyFee}
+              max={10}
+              step={0.001}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">매도 수수료 (%)</label>
-            <input
-              type="number"
-              step="0.001"
+            <label className="block text-sm font-medium text-gray-700 mb-1">매도 수수료</label>
+            <PercentInput
               value={sellFee}
-              onChange={(e) => setSellFee(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm"
+              onChange={setSellFee}
+              max={10}
+              step={0.001}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">세금 (%)</label>
-            <input
-              type="number"
-              step="0.01"
+            <label className="block text-sm font-medium text-gray-700 mb-1">세금</label>
+            <PercentInput
               value={tax}
-              onChange={(e) => setTax(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-sm"
+              onChange={setTax}
+              max={10}
+              step={0.01}
             />
           </div>
         </div>
@@ -169,6 +163,20 @@ export function StockReturnCalculator() {
               <span>{Math.round(result.taxAmount).toLocaleString()}원</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 매매차익 = 매도금액 - 매수금액</p>
+          <p>• 순수익 = 매매차익 - 수수료 - 세금</p>
+          <p>• 수익률 = 순수익 ÷ 매수금액 × 100</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">2024년 기준</p>
+          <p>• 증권사 수수료: 약 0.015%</p>
+          <p>• 거래세: 코스피 0.18%, 코스닥 0.23%</p>
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { loanCalculator } from "@/lib/math/loan-calculator";
 import type { LoanInput, RepaymentType } from "@/lib/types/loan";
+import { MoneyInput, PercentInput, NumberInput } from "@/components/ui";
 
 const repaymentTypes: { value: RepaymentType; label: string; description: string }[] = [
   {
@@ -23,27 +24,25 @@ const repaymentTypes: { value: RepaymentType; label: string; description: string
 ];
 
 export function LoanCalculator() {
-  const [principal, setPrincipal] = useState<string>("100000000");
-  const [annualRate, setAnnualRate] = useState<string>("5.0");
-  const [termYears, setTermYears] = useState<string>("30");
+  const [principal, setPrincipal] = useState<number>(100000000);
+  const [annualRate, setAnnualRate] = useState<number>(5.0);
+  const [termYears, setTermYears] = useState<number>(30);
   const [repaymentType, setRepaymentType] = useState<RepaymentType>("equal-payment");
-  const [gracePeriodMonths, setGracePeriodMonths] = useState<string>("0");
+  const [gracePeriodMonths, setGracePeriodMonths] = useState<number>(0);
   const [showSchedule, setShowSchedule] = useState<boolean>(false);
 
   const result = useMemo(() => {
-    const principalValue = parseInt(principal) || 0;
-    const rate = parseFloat(annualRate) / 100 || 0;
-    const months = (parseInt(termYears) || 0) * 12;
-    const grace = parseInt(gracePeriodMonths) || 0;
+    const rate = annualRate / 100 || 0;
+    const months = termYears * 12;
 
-    if (principalValue <= 0 || months <= 0) return null;
+    if (principal <= 0 || months <= 0) return null;
 
     const input: LoanInput = {
-      principal: principalValue,
+      principal: principal,
       annualRate: rate,
       termMonths: months,
       repaymentType,
-      gracePeriodMonths: grace,
+      gracePeriodMonths: gracePeriodMonths,
     };
 
     return loanCalculator.calculate(input);
@@ -68,19 +67,18 @@ export function LoanCalculator() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             대출금액
           </label>
-          <input
-            type="text"
-            inputMode="numeric"
+          <MoneyInput
             value={principal}
-            onChange={(e) => setPrincipal(e.target.value.replace(/[^0-9]/g, ""))}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-right text-lg"
-            placeholder="100,000,000"
+            onChange={setPrincipal}
+            step={10000000}
+            min={0}
+            placeholder="대출금액 입력"
           />
           <div className="flex flex-wrap gap-2 mt-2">
             {quickAmounts.map((amount) => (
               <button
                 key={amount}
-                onClick={() => setPrincipal(amount.toString())}
+                onClick={() => setPrincipal(amount)}
                 className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-blue-100 text-gray-600 hover:text-blue-600 rounded-full transition-colors"
               >
                 {amount >= 100000000
@@ -95,28 +93,28 @@ export function LoanCalculator() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              연이율 (%)
+              연이율
             </label>
-            <input
-              type="text"
-              inputMode="decimal"
+            <PercentInput
               value={annualRate}
-              onChange={(e) => setAnnualRate(e.target.value.replace(/[^0-9.]/g, ""))}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-right"
-              placeholder="5.0"
+              onChange={setAnnualRate}
+              min={0}
+              max={30}
+              step={0.1}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              대출기간 (년)
+              대출기간
             </label>
-            <input
-              type="text"
-              inputMode="numeric"
+            <NumberInput
               value={termYears}
-              onChange={(e) => setTermYears(e.target.value.replace(/[^0-9]/g, ""))}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-right"
-              placeholder="30"
+              onChange={setTermYears}
+              min={1}
+              max={50}
+              step={1}
+              format="none"
+              suffix="년"
             />
           </div>
         </div>
@@ -152,15 +150,16 @@ export function LoanCalculator() {
         {repaymentType !== "bullet" && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              거치기간 (개월)
+              거치기간
             </label>
-            <input
-              type="text"
-              inputMode="numeric"
+            <NumberInput
               value={gracePeriodMonths}
-              onChange={(e) => setGracePeriodMonths(e.target.value.replace(/[^0-9]/g, ""))}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-right"
-              placeholder="0"
+              onChange={setGracePeriodMonths}
+              min={0}
+              max={60}
+              step={1}
+              format="none"
+              suffix="개월"
             />
             <p className="text-xs text-gray-500 mt-1">
               거치기간 동안은 이자만 납부합니다
@@ -263,10 +262,19 @@ export function LoanCalculator() {
             </div>
           )}
 
-          {/* 안내 문구 */}
-          <div className="text-xs text-gray-500 space-y-1">
-            <p>* {result.repaymentDescription} 방식으로 계산됩니다.</p>
-            <p>* 실제 대출 조건에 따라 금액이 달라질 수 있습니다.</p>
+          {/* 계산 공식 */}
+          <div className="bg-gray-50 rounded-lg p-4">
+            <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p className="font-medium">원리금균등</p>
+              <p>• 월 납입금 = P × r × (1+r)ⁿ / [(1+r)ⁿ - 1]</p>
+              <p className="font-medium mt-1">원금균등</p>
+              <p>• 월 원금 = P / n, 월 이자 = 잔액 × r</p>
+              <p className="font-medium mt-1">만기일시</p>
+              <p>• 월 이자 = P × r, 만기 시 원금 일시상환</p>
+              <p className="pl-3 mt-1">P: 원금, r: 월이율, n: 총 개월수</p>
+            </div>
+            <p className="text-xs text-gray-400 mt-2">* 실제 대출 조건에 따라 금액이 달라질 수 있음</p>
           </div>
         </div>
       )}

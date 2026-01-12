@@ -1,20 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 export function PensionCalculator() {
-  const [birthYear, setBirthYear] = useState("1985");
-  const [monthlySalary, setMonthlySalary] = useState("350");
-  const [workYears, setWorkYears] = useState("30");
-  const [expectedRetireAge, setExpectedRetireAge] = useState("65");
+  const [birthYear, setBirthYear] = useState<number>(1985);
+  const [monthlySalary, setMonthlySalary] = useState<number>(350);
+  const [workYears, setWorkYears] = useState<number>(30);
 
   const calculate = () => {
-    const birth = parseInt(birthYear);
-    const salary = parseInt(monthlySalary) * 10000; // 만원 단위
-    const years = parseInt(workYears);
-    const retireAge = parseInt(expectedRetireAge);
-
-    if (isNaN(birth) || isNaN(salary) || isNaN(years)) return null;
+    const birth = birthYear || 1985;
+    const salary = (monthlySalary || 0) * 10000; // 만원 단위
+    const years = workYears || 0;
 
     // 국민연금 수령 나이 (출생년도에 따라)
     let pensionAge = 65;
@@ -75,37 +72,40 @@ export function PensionCalculator() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">출생년도</label>
-            <input
-              type="number"
+            <NumberInput
               value={birthYear}
-              onChange={(e) => setBirthYear(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
-              placeholder="1985"
+              onChange={setBirthYear}
+              min={1950}
+              max={2010}
+              step={1}
+              format="none"
+              suffix="년"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">예상 가입기간</label>
-            <div className="relative">
-              <input
-                type="number"
-                value={workYears}
-                onChange={(e) => setWorkYears(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
-                placeholder="30"
-              />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">년</span>
-            </div>
+            <NumberInput
+              value={workYears}
+              onChange={setWorkYears}
+              min={10}
+              max={45}
+              step={1}
+              format="none"
+              suffix="년"
+            />
           </div>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">월 평균 소득 (만원)</label>
-          <input
-            type="number"
+          <NumberInput
             value={monthlySalary}
-            onChange={(e) => setMonthlySalary(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-lg"
-            placeholder="350"
+            onChange={setMonthlySalary}
+            min={0}
+            max={590}
+            step={10}
+            format="comma"
+            suffix="만원"
           />
           <p className="text-xs text-gray-400 mt-1">세전 월급 기준 (상한액 590만원)</p>
         </div>
@@ -147,12 +147,20 @@ export function PensionCalculator() {
       )}
 
       <div className="mt-4 p-4 bg-gray-50 rounded-xl">
-        <p className="text-sm font-medium text-gray-700 mb-2">참고사항</p>
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
         <div className="text-xs text-gray-500 space-y-1">
-          <p>• 실제 연금액은 물가 상승률 등에 따라 달라집니다</p>
-          <p>• 국민연금 최소 가입기간: 10년</p>
-          <p>• 자세한 내용은 국민연금공단에서 확인하세요</p>
+          <p>• 월 보험료 = min(소득월액, 590만원) × 9% (본인 4.5%)</p>
+          <p>• 기본연금액 = (A + B) × P × (n/12)</p>
+          <p className="pl-3">A: 전 가입자 평균소득월액 (약 280만원)</p>
+          <p className="pl-3">B: 본인 평균소득월액</p>
+          <p className="pl-3">P: 소득대체율 (20년 기준 40%)</p>
+          <p className="pl-3">n: 가입월수</p>
         </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200 space-y-1">
+          <p>• 최소 가입기간: 10년</p>
+          <p>• 수령 연령: 출생년도별 60~65세</p>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">2024년 국민연금법 기준</p>
       </div>
     </div>
   );

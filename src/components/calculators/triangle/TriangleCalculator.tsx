@@ -280,9 +280,15 @@ export function TriangleCalculator() {
         />
       )}
 
-      {/* Footer */}
-      <div className="mt-6 py-4 text-center text-gray-400 text-xs border-t border-gray-100">
-        <p>코사인 법칙 · 사인 법칙 · 피타고라스 정리</p>
+      {/* 계산 공식 */}
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 피타고라스: c² = a² + b² (직각삼각형)</p>
+          <p>• 코사인 법칙: c² = a² + b² - 2ab·cos(C)</p>
+          <p>• 사인 법칙: a/sin(A) = b/sin(B) = c/sin(C)</p>
+          <p>• 넓이: S = ½ab·sin(C) = √[s(s-a)(s-b)(s-c)]</p>
+        </div>
       </div>
     </div>
   );

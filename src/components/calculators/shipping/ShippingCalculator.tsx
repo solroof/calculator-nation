@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 // 택배사별 기본 요금표 (2024년 기준)
 const carriers = {
@@ -20,17 +21,17 @@ const sizeRates = [
 ];
 
 export function ShippingCalculator() {
-  const [weight, setWeight] = useState("2");
-  const [length, setLength] = useState("30");
-  const [width, setWidth] = useState("20");
-  const [height, setHeight] = useState("15");
+  const [weight, setWeight] = useState<number>(2);
+  const [length, setLength] = useState<number>(30);
+  const [width, setWidth] = useState<number>(20);
+  const [height, setHeight] = useState<number>(15);
   const [isJeju, setIsJeju] = useState(false);
 
   const calculate = () => {
-    const w = parseFloat(weight) || 0;
-    const l = parseFloat(length) || 0;
-    const wd = parseFloat(width) || 0;
-    const h = parseFloat(height) || 0;
+    const w = weight || 0;
+    const l = length || 0;
+    const wd = width || 0;
+    const h = height || 0;
 
     // 부피 무게 계산 (가로+세로+높이 합)
     const totalSize = l + wd + h;
@@ -99,13 +100,13 @@ export function ShippingCalculator() {
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">실제 무게 (kg)</label>
-          <input
-            type="number"
-            step="0.1"
+          <NumberInput
             value={weight}
-            onChange={(e) => setWeight(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 text-lg"
-            placeholder="2"
+            onChange={setWeight}
+            min={0}
+            step={0.1}
+            format="none"
+            suffix="kg"
           />
         </div>
 
@@ -113,32 +114,32 @@ export function ShippingCalculator() {
           <label className="block text-sm font-medium text-gray-700 mb-1">박스 크기 (cm)</label>
           <div className="grid grid-cols-3 gap-2">
             <div>
-              <input
-                type="number"
+              <NumberInput
                 value={length}
-                onChange={(e) => setLength(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 text-center"
-                placeholder="가로"
+                onChange={setLength}
+                min={0}
+                step={1}
+                format="none"
               />
               <p className="text-xs text-gray-400 text-center mt-1">가로</p>
             </div>
             <div>
-              <input
-                type="number"
+              <NumberInput
                 value={width}
-                onChange={(e) => setWidth(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 text-center"
-                placeholder="세로"
+                onChange={setWidth}
+                min={0}
+                step={1}
+                format="none"
               />
               <p className="text-xs text-gray-400 text-center mt-1">세로</p>
             </div>
             <div>
-              <input
-                type="number"
+              <NumberInput
                 value={height}
-                onChange={(e) => setHeight(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 text-center"
-                placeholder="높이"
+                onChange={setHeight}
+                min={0}
+                step={1}
+                format="none"
               />
               <p className="text-xs text-gray-400 text-center mt-1">높이</p>
             </div>
@@ -194,9 +195,21 @@ export function ShippingCalculator() {
         ))}
       </div>
 
-      <p className="text-xs text-gray-400 mt-4 text-center">
-        * 요금은 택배사 및 계약조건에 따라 다를 수 있습니다
-      </p>
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 부피무게 = (가로 × 세로 × 높이) ÷ 6,000</p>
+          <p>• 적용무게 = max(실제무게, 부피무게)</p>
+          <p>• 총 크기 = 가로 + 세로 + 높이</p>
+          <p>• 택배비 = 기본요금 + 무게추가요금 + 크기추가요금</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">크기별 추가요금</p>
+          <p>80cm 이하: 0원 | 100cm: +1,000원 | 120cm: +2,000원</p>
+          <p>140cm: +3,000원 | 160cm 초과: +5,000원</p>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">2024년 택배사 공시요금 기준</p>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MoneyInput } from "@/components/ui";
 
 // 2024년 종합소득세율
 const taxBrackets = [
@@ -15,14 +16,14 @@ const taxBrackets = [
 ];
 
 export function IncomeTaxCalculator() {
-  const [income, setIncome] = useState("50000000");
-  const [expenses, setExpenses] = useState("0");
-  const [deductions, setDeductions] = useState("1500000");
+  const [income, setIncome] = useState<number>(50000000);
+  const [expenses, setExpenses] = useState<number>(0);
+  const [deductions, setDeductions] = useState<number>(1500000);
 
   const calculate = () => {
-    const totalIncome = parseFloat(income) || 0;
-    const totalExpenses = parseFloat(expenses) || 0;
-    const totalDeductions = parseFloat(deductions) || 0;
+    const totalIncome = income || 0;
+    const totalExpenses = expenses || 0;
+    const totalDeductions = deductions || 0;
 
     // 과세표준 = 소득 - 필요경비 - 소득공제
     const taxableIncome = Math.max(0, totalIncome - totalExpenses - totalDeductions);
@@ -78,36 +79,33 @@ export function IncomeTaxCalculator() {
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">연간 총수입 (원)</label>
-          <input
-            type="number"
+          <label className="block text-sm font-medium text-gray-700 mb-1">연간 총수입</label>
+          <MoneyInput
             value={income}
-            onChange={(e) => setIncome(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-lg"
-            placeholder="50000000"
+            onChange={setIncome}
+            min={0}
+            step={1000000}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">필요경비 (원)</label>
-          <input
-            type="number"
+          <label className="block text-sm font-medium text-gray-700 mb-1">필요경비</label>
+          <MoneyInput
             value={expenses}
-            onChange={(e) => setExpenses(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
-            placeholder="0"
+            onChange={setExpenses}
+            min={0}
+            step={100000}
           />
           <p className="text-xs text-gray-400 mt-1">사업 관련 지출 비용</p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">소득공제 (원)</label>
-          <input
-            type="number"
+          <label className="block text-sm font-medium text-gray-700 mb-1">소득공제</label>
+          <MoneyInput
             value={deductions}
-            onChange={(e) => setDeductions(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
-            placeholder="1500000"
+            onChange={setDeductions}
+            min={0}
+            step={100000}
           />
           <p className="text-xs text-gray-400 mt-1">기본공제 150만원 + 추가공제</p>
         </div>
@@ -143,13 +141,20 @@ export function IncomeTaxCalculator() {
         </div>
       </div>
 
-      <div className="mt-4 p-3 bg-blue-50 rounded-xl">
-        <p className="text-sm font-medium text-blue-800 mb-2">2024년 종합소득세율</p>
-        <div className="text-xs text-gray-600 space-y-1">
-          <p>1,400만 이하: 6% | ~5,000만: 15%</p>
-          <p>~8,800만: 24% | ~1.5억: 35%</p>
-          <p>~3억: 38% | ~5억: 40% | ~10억: 42% | 10억 초과: 45%</p>
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 과세표준 = 총수입 - 필요경비 - 소득공제</p>
+          <p>• 소득세 = 과세표준 × 세율 - 누진공제</p>
+          <p>• 지방소득세 = 소득세 × 10%</p>
+          <p>• 총 납부세액 = 소득세 + 지방소득세</p>
         </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">2024년 종합소득세율</p>
+          <p>1,400만 이하: 6% | ~5,000만: 15% | ~8,800만: 24%</p>
+          <p>~1.5억: 35% | ~3억: 38% | ~5억: 40% | ~10억: 42% | 10억 초과: 45%</p>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">2024년 소득세법 기준</p>
       </div>
     </div>
   );

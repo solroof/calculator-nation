@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 
 const units = [
   { key: "deg", name: "도 (°)", factor: 1 },
@@ -14,9 +14,8 @@ const units = [
 export function AngleConverter() {
   const [value, setValue] = useState("90");
   const [fromUnit, setFromUnit] = useState("deg");
-  const [results, setResults] = useState<Record<string, string>>({});
 
-  useEffect(() => {
+  const results = useMemo(() => {
     const inputValue = parseFloat(value) || 0;
     const fromFactor = units.find((u) => u.key === fromUnit)?.factor || 1;
     const baseDegrees = inputValue * fromFactor;
@@ -32,7 +31,7 @@ export function AngleConverter() {
         newResults[unit.key] = converted.toLocaleString(undefined, { maximumFractionDigits: 8 });
       }
     });
-    setResults(newResults);
+    return newResults;
   }, [value, fromUnit]);
 
   // 삼각함수 값 계산

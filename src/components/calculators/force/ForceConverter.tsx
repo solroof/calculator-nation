@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 
 const units = [
   { key: "N", name: "뉴턴 (N)", factor: 1 },
@@ -19,9 +19,8 @@ const units = [
 export function ForceConverter() {
   const [value, setValue] = useState("1");
   const [fromUnit, setFromUnit] = useState("kgf");
-  const [results, setResults] = useState<Record<string, string>>({});
 
-  useEffect(() => {
+  const results = useMemo(() => {
     const inputValue = parseFloat(value) || 0;
     const fromFactor = units.find((u) => u.key === fromUnit)?.factor || 1;
     const baseN = inputValue * fromFactor;
@@ -37,7 +36,7 @@ export function ForceConverter() {
         newResults[unit.key] = converted.toLocaleString(undefined, { maximumFractionDigits: 6 });
       }
     });
-    setResults(newResults);
+    return newResults;
   }, [value, fromUnit]);
 
   return (

@@ -1,22 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 type CarType = "passenger" | "electric" | "hybrid" | "commercial";
 
 export function CarTaxCalculator() {
   const [carType, setCarType] = useState<CarType>("passenger");
-  const [cc, setCc] = useState("2000");
-  const [year, setYear] = useState("2020");
-  const [isEco, setIsEco] = useState(false);
+  const [cc, setCc] = useState<number>(2000);
+  const [year, setYear] = useState<number>(2020);
 
   const calculateTax = () => {
-    const ccNum = parseInt(cc);
-    const yearNum = parseInt(year);
+    const ccNum = cc || 0;
+    const yearNum = year || 2020;
     const currentYear = new Date().getFullYear();
     const carAge = currentYear - yearNum;
 
-    if (isNaN(ccNum) || isNaN(yearNum)) return null;
 
     // 비영업용 승용차 기준
     let baseTax = 0;
@@ -125,27 +124,27 @@ export function CarTaxCalculator() {
         {carType !== "electric" && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">배기량 (cc)</label>
-            <input
-              type="number"
+            <NumberInput
               value={cc}
-              onChange={(e) => setCc(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-slate-500 text-lg"
-              placeholder="예: 2000"
-              min="0"
+              onChange={setCc}
+              min={0}
+              step={100}
+              format="comma"
+              suffix="cc"
             />
           </div>
         )}
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">차량 연식 (년도)</label>
-          <input
-            type="number"
+          <NumberInput
             value={year}
-            onChange={(e) => setYear(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-slate-500 text-lg"
-            placeholder="예: 2020"
-            min="1990"
+            onChange={setYear}
+            min={1990}
             max={new Date().getFullYear()}
+            step={1}
+            format="none"
+            suffix="년"
           />
         </div>
       </div>
@@ -182,12 +181,23 @@ export function CarTaxCalculator() {
       )}
 
       <div className="mt-4 p-4 bg-gray-50 rounded-xl">
-        <p className="text-sm font-medium text-gray-700 mb-2">참고</p>
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
         <div className="text-xs text-gray-500 space-y-1">
-          <p>• 자동차세는 6월, 12월 2회 분납</p>
-          <p>• 1월 연납 시 약 9.15% 할인</p>
+          <p>• 기본세액 = 배기량(cc) × 세액(원/cc)</p>
+          <p>• 경감세액 = 기본세액 × (1 - 차령경감률)</p>
+          <p>• 지방교육세 = 경감세액 × 30%</p>
+          <p>• 총 세액 = 경감세액 + 지방교육세</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">배기량별 세액 (비영업용)</p>
+          <p>1,000cc 이하: 80원/cc | 1,600cc 이하: 140원/cc | 초과: 200원/cc</p>
+          <p className="mt-1">전기차: 연 13만원 (고정)</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200 space-y-1">
+          <p>• 6월/12월 2회 분납, 1월 연납 시 약 9.15% 할인</p>
           <p>• 차령 3년 이상부터 매년 5%씩 경감 (최대 50%)</p>
         </div>
+        <p className="text-xs text-gray-400 mt-2">지방세법 기준</p>
       </div>
     </div>
   );

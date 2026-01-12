@@ -1,25 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 type Gender = "male" | "female";
 
 export function BodyFatCalculator() {
   const [gender, setGender] = useState<Gender>("male");
-  const [weight, setWeight] = useState("70");
-  const [height, setHeight] = useState("175");
-  const [neck, setNeck] = useState("38");
-  const [waist, setWaist] = useState("85");
-  const [hip, setHip] = useState("95");
+  const [weight, setWeight] = useState<number>(70);
+  const [height, setHeight] = useState<number>(175);
+  const [neck, setNeck] = useState<number>(38);
+  const [waist, setWaist] = useState<number>(85);
+  const [hip, setHip] = useState<number>(95);
 
   const calculateBodyFat = () => {
-    const w = parseFloat(weight);
-    const h = parseFloat(height);
-    const n = parseFloat(neck);
-    const waistNum = parseFloat(waist);
-    const hipNum = parseFloat(hip);
-
-    if (isNaN(w) || isNaN(h) || isNaN(n) || isNaN(waistNum)) return null;
+    if (weight <= 0 || height <= 0 || neck <= 0 || waist <= 0) return null;
 
     let bodyFat: number;
 
@@ -28,25 +23,25 @@ export function BodyFatCalculator() {
       bodyFat =
         495 /
           (1.0324 -
-            0.19077 * Math.log10(waistNum - n) +
-            0.15456 * Math.log10(h)) -
+            0.19077 * Math.log10(waist - neck) +
+            0.15456 * Math.log10(height)) -
         450;
     } else {
-      if (isNaN(hipNum)) return null;
+      if (hip <= 0) return null;
       bodyFat =
         495 /
           (1.29579 -
-            0.35004 * Math.log10(waistNum + hipNum - n) +
-            0.221 * Math.log10(h)) -
+            0.35004 * Math.log10(waist + hip - neck) +
+            0.221 * Math.log10(height)) -
         450;
     }
 
     bodyFat = Math.max(0, Math.min(60, bodyFat));
 
     // 체지방량 (kg)
-    const fatMass = (w * bodyFat) / 100;
+    const fatMass = (weight * bodyFat) / 100;
     // 제지방량 (kg)
-    const leanMass = w - fatMass;
+    const leanMass = weight - fatMass;
 
     // 평가
     let status: string;
@@ -137,54 +132,69 @@ export function BodyFatCalculator() {
       <div className="space-y-4 mb-4">
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">키 (cm)</label>
-            <input
-              type="number"
+            <label className="block text-sm font-medium text-gray-700 mb-1">키</label>
+            <NumberInput
               value={height}
-              onChange={(e) => setHeight(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-500"
+              onChange={setHeight}
+              min={100}
+              max={250}
+              step={1}
+              format="none"
+              suffix="cm"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">체중 (kg)</label>
-            <input
-              type="number"
+            <label className="block text-sm font-medium text-gray-700 mb-1">체중</label>
+            <NumberInput
               value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-500"
+              onChange={setWeight}
+              min={20}
+              max={200}
+              step={1}
+              format="none"
+              suffix="kg"
             />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">목둘레 (cm)</label>
-            <input
-              type="number"
+            <label className="block text-sm font-medium text-gray-700 mb-1">목둘레</label>
+            <NumberInput
               value={neck}
-              onChange={(e) => setNeck(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-500"
+              onChange={setNeck}
+              min={20}
+              max={60}
+              step={0.5}
+              format="none"
+              suffix="cm"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">허리둘레 (cm)</label>
-            <input
-              type="number"
+            <label className="block text-sm font-medium text-gray-700 mb-1">허리둘레</label>
+            <NumberInput
               value={waist}
-              onChange={(e) => setWaist(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-500"
+              onChange={setWaist}
+              min={40}
+              max={200}
+              step={0.5}
+              format="none"
+              suffix="cm"
             />
           </div>
         </div>
 
         {gender === "female" && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">엉덩이둘레 (cm)</label>
-            <input
-              type="number"
+            <label className="block text-sm font-medium text-gray-700 mb-1">엉덩이둘레</label>
+            <NumberInput
               value={hip}
-              onChange={(e) => setHip(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-500"
+              onChange={setHip}
+              min={50}
+              max={200}
+              step={0.5}
+              format="none"
+              suffix="cm"
             />
           </div>
         )}
@@ -219,24 +229,18 @@ export function BodyFatCalculator() {
       )}
 
       <div className="mt-4 p-4 bg-gray-50 rounded-xl">
-        <p className="text-sm font-medium text-gray-700 mb-2">체지방률 기준</p>
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식 (US Navy Method)</p>
         <div className="text-xs text-gray-500 space-y-1">
+          <p>• 남성: 495/(1.0324-0.19077×log(허리-목)+0.15456×log(키))-450</p>
+          <p>• 여성: 495/(1.29579-0.35004×log(허리+엉덩이-목)+0.221×log(키))-450</p>
+          <p>• 체지방량(kg) = 체중 × 체지방률(%)</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">체지방률 기준 ({gender === "male" ? "남성" : "여성"})</p>
           {gender === "male" ? (
-            <>
-              <p>• 필수 지방: 2-5%</p>
-              <p>• 운동선수: 6-13%</p>
-              <p>• 건강: 14-17%</p>
-              <p>• 평균: 18-24%</p>
-              <p>• 비만: 25% 이상</p>
-            </>
+            <p>필수 2-5% | 운동선수 6-13% | 건강 14-17% | 평균 18-24% | 비만 25%+</p>
           ) : (
-            <>
-              <p>• 필수 지방: 10-13%</p>
-              <p>• 운동선수: 14-20%</p>
-              <p>• 건강: 21-24%</p>
-              <p>• 평균: 25-31%</p>
-              <p>• 비만: 32% 이상</p>
-            </>
+            <p>필수 10-13% | 운동선수 14-20% | 건강 21-24% | 평균 25-31% | 비만 32%+</p>
           )}
         </div>
       </div>

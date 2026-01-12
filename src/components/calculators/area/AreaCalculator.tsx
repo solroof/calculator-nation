@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 type Unit = "sqmm" | "sqcm" | "sqm" | "are" | "hectare" | "sqkm" | "pyeong" | "sqft" | "sqyard" | "acre";
 
@@ -18,13 +19,12 @@ const units: { key: Unit; label: string; toSqm: number }[] = [
 ];
 
 export function AreaCalculator() {
-  const [value, setValue] = useState("1");
+  const [value, setValue] = useState<number>(1);
   const [fromUnit, setFromUnit] = useState<Unit>("sqm");
   const [toUnit, setToUnit] = useState<Unit>("pyeong");
 
   const convert = () => {
-    const num = parseFloat(value);
-    if (isNaN(num)) return 0;
+    const num = value || 0;
 
     const fromData = units.find((u) => u.key === fromUnit);
     const toData = units.find((u) => u.key === toUnit);
@@ -55,12 +55,11 @@ export function AreaCalculator() {
       <div className="space-y-4 mb-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">값 입력</label>
-          <input
-            type="number"
+          <NumberInput
             value={value}
-            onChange={(e) => setValue(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 text-lg"
-            placeholder="변환할 값"
+            onChange={setValue}
+            step={1}
+            format="comma"
           />
         </div>
 
@@ -109,6 +108,19 @@ export function AreaCalculator() {
         <p className="text-white/70 text-sm mt-2">
           {value} {fromUnit} = {result.toLocaleString(undefined, { maximumFractionDigits: 6 })} {toUnit}
         </p>
+      </div>
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">변환 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 결과 = 입력값 × (기준단위 비율 / 변환단위 비율)</p>
+          <p>• 기준 단위: 제곱미터 (m²)</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">주요 변환 비율</p>
+          <p>1 평 = 3.306 m² | 1 ha = 10,000 m²</p>
+          <p>1 acre = 4,047 m² | 1 ft² = 0.093 m²</p>
+        </div>
       </div>
     </div>
   );

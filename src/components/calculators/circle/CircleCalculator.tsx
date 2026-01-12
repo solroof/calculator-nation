@@ -1,31 +1,31 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 type CalcMode = "radius" | "diameter" | "area" | "circumference";
 
 export function CircleCalculator() {
   const [mode, setMode] = useState<CalcMode>("radius");
-  const [value, setValue] = useState("10");
+  const [value, setValue] = useState<number>(10);
 
   const calculate = () => {
-    const num = parseFloat(value);
-    if (isNaN(num) || num <= 0) return null;
+    if (value <= 0) return null;
 
     let radius: number;
 
     switch (mode) {
       case "radius":
-        radius = num;
+        radius = value;
         break;
       case "diameter":
-        radius = num / 2;
+        radius = value / 2;
         break;
       case "area":
-        radius = Math.sqrt(num / Math.PI);
+        radius = Math.sqrt(value / Math.PI);
         break;
       case "circumference":
-        radius = num / (2 * Math.PI);
+        radius = value / (2 * Math.PI);
         break;
       default:
         return null;
@@ -83,14 +83,12 @@ export function CircleCalculator() {
             {modes.find((m) => m.key === mode)?.label} 입력
             {mode === "area" && " (단위²)"}
           </label>
-          <input
-            type="number"
+          <NumberInput
             value={value}
-            onChange={(e) => setValue(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-lg"
-            placeholder="값 입력"
-            min="0"
-            step="any"
+            onChange={setValue}
+            min={0}
+            step={1}
+            format="comma"
           />
         </div>
       </div>

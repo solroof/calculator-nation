@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 
 const units = [
   { key: "ml", name: "밀리리터 (mL)", factor: 1 },
@@ -21,9 +21,8 @@ const units = [
 export function VolumeConverter() {
   const [value, setValue] = useState("1");
   const [fromUnit, setFromUnit] = useState("L");
-  const [results, setResults] = useState<Record<string, string>>({});
 
-  useEffect(() => {
+  const results = useMemo(() => {
     const inputValue = parseFloat(value) || 0;
     const fromFactor = units.find((u) => u.key === fromUnit)?.factor || 1;
     const baseMl = inputValue * fromFactor;
@@ -39,7 +38,7 @@ export function VolumeConverter() {
         newResults[unit.key] = converted.toLocaleString(undefined, { maximumFractionDigits: 6 });
       }
     });
-    setResults(newResults);
+    return newResults;
   }, [value, fromUnit]);
 
   return (

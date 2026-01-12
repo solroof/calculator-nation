@@ -3,40 +3,32 @@
 import { useState } from 'react';
 import { salaryCalculator } from '@/lib/math/salary-calculator';
 import type { SalaryInput, SalaryResult } from '@/lib/types/salary';
-
-function formatNumber(num: number): string {
-  return num.toLocaleString('ko-KR');
-}
+import { MoneyInput, NumberInput } from "@/components/ui";
 
 function formatWon(num: number): string {
   return num.toLocaleString('ko-KR') + '원';
 }
 
 export function SalaryCalculator() {
-  const [annualSalary, setAnnualSalary] = useState<string>('50000000');
-  const [dependents, setDependents] = useState<string>('1');
-  const [childrenUnder20, setChildrenUnder20] = useState<string>('0');
-  const [meals, setMeals] = useState<string>('0');
+  const [annualSalary, setAnnualSalary] = useState<number>(50000000);
+  const [dependents, setDependents] = useState<number>(1);
+  const [childrenUnder20, setChildrenUnder20] = useState<number>(0);
+  const [meals, setMeals] = useState<number>(0);
   const [showDetail, setShowDetail] = useState(false);
   const [result, setResult] = useState<SalaryResult | null>(null);
 
   const handleCalculate = () => {
     const input: SalaryInput = {
-      annualSalary: parseInt(annualSalary.replace(/,/g, '')) || 0,
-      dependents: parseInt(dependents) || 1,
-      childrenUnder20: parseInt(childrenUnder20) || 0,
+      annualSalary: annualSalary || 0,
+      dependents: dependents || 1,
+      childrenUnder20: childrenUnder20 || 0,
       taxExempt: {
-        meals: parseInt(meals) || 0,
+        meals: meals || 0,
       },
     };
 
     const calcResult = salaryCalculator.calculate(input);
     setResult(calcResult);
-  };
-
-  const handleSalaryChange = (value: string) => {
-    const num = value.replace(/[^0-9]/g, '');
-    setAnnualSalary(num);
   };
 
   const quickSalaries = [3000, 4000, 5000, 6000, 7000, 8000, 10000];
@@ -59,9 +51,9 @@ export function SalaryCalculator() {
           {quickSalaries.map((salary) => (
             <button
               key={salary}
-              onClick={() => setAnnualSalary((salary * 10000).toString())}
+              onClick={() => setAnnualSalary(salary * 10000)}
               className={`px-3 py-1.5 rounded-lg text-sm transition-all ${
-                parseInt(annualSalary) === salary * 10000
+                annualSalary === salary * 10000
                   ? 'bg-blue-500 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
@@ -78,16 +70,13 @@ export function SalaryCalculator() {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             연봉 (세전)
           </label>
-          <div className="relative">
-            <input
-              type="text"
-              value={formatNumber(parseInt(annualSalary) || 0)}
-              onChange={(e) => handleSalaryChange(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-lg font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="50,000,000"
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">원</span>
-          </div>
+          <MoneyInput
+            value={annualSalary}
+            onChange={setAnnualSalary}
+            step={1000000}
+            min={0}
+            placeholder="연봉 입력"
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -95,29 +84,29 @@ export function SalaryCalculator() {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               부양가족 수 (본인 포함)
             </label>
-            <select
+            <NumberInput
               value={dependents}
-              onChange={(e) => setDependents(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                <option key={n} value={n}>{n}명</option>
-              ))}
-            </select>
+              onChange={setDependents}
+              min={1}
+              max={10}
+              step={1}
+              format="none"
+              suffix="명"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               20세 이하 자녀
             </label>
-            <select
+            <NumberInput
               value={childrenUnder20}
-              onChange={(e) => setChildrenUnder20(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              {[0, 1, 2, 3, 4, 5].map((n) => (
-                <option key={n} value={n}>{n}명</option>
-              ))}
-            </select>
+              onChange={setChildrenUnder20}
+              min={0}
+              max={10}
+              step={1}
+              format="none"
+              suffix="명"
+            />
           </div>
         </div>
 
@@ -134,13 +123,12 @@ export function SalaryCalculator() {
               <label className="block text-sm text-gray-600 mb-1">
                 식대 (월 최대 20만원 비과세)
               </label>
-              <input
-                type="number"
+              <MoneyInput
                 value={meals}
-                onChange={(e) => setMeals(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg"
-                placeholder="0"
+                onChange={setMeals}
                 max={200000}
+                step={10000}
+                placeholder="0"
               />
             </div>
           )}
@@ -253,10 +241,19 @@ export function SalaryCalculator() {
         </div>
       )}
 
-      {/* Footer */}
-      <div className="mt-6 py-4 text-center text-gray-400 text-xs border-t border-gray-100">
-        <p>2024년 기준 · 간이세액표 적용</p>
-        <p className="mt-1">실제 금액과 차이가 있을 수 있습니다</p>
+      {/* 계산 공식 */}
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 월 급여 = 연봉 ÷ 12</p>
+          <p>• 실수령액 = 월 급여 - 4대보험 - 세금</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">4대보험 요율 (2024년, 근로자 부담분)</p>
+          <p>국민연금: 4.5% | 건강보험: 3.545%</p>
+          <p>장기요양: 건강보험 × 12.95% | 고용보험: 0.9%</p>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">간이세액표 적용 · 실제 금액과 다를 수 있음</p>
       </div>
     </div>
   );

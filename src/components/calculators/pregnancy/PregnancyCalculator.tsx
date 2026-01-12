@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DatePicker } from "@/components/ui";
 
 type CalcMode = "lmp" | "dueDate";
 
@@ -128,11 +129,10 @@ export function PregnancyCalculator() {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               마지막 생리 시작일 (LMP)
             </label>
-            <input
-              type="date"
+            <DatePicker
               value={lmpDate}
-              onChange={(e) => setLmpDate(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-500"
+              onChange={setLmpDate}
+              placeholder="날짜 선택"
             />
           </div>
         ) : (
@@ -140,11 +140,10 @@ export function PregnancyCalculator() {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               출산 예정일
             </label>
-            <input
-              type="date"
+            <DatePicker
               value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-rose-500"
+              onChange={setDueDate}
+              placeholder="날짜 선택"
             />
           </div>
         )}
@@ -201,12 +200,18 @@ export function PregnancyCalculator() {
       )}
 
       <div className="mt-4 p-4 bg-gray-50 rounded-xl">
-        <p className="text-sm font-medium text-gray-700 mb-2">임신 주수 참고</p>
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
         <div className="text-xs text-gray-500 space-y-1">
+          <p>• 출산예정일 = 마지막 생리일 + 280일 (40주)</p>
+          <p>• 임신 주수 = (현재일 - 마지막 생리일) ÷ 7</p>
+          <p>• Naegele 공식: 생리일 + 1년 - 3개월 + 7일</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">임신 시기</p>
           <p>• 초기 (1~12주): 주요 장기 형성</p>
           <p>• 중기 (13~27주): 태동 느끼기 시작</p>
           <p>• 말기 (28~40주): 출산 준비</p>
-          <p className="text-gray-400 mt-2">※ 정확한 정보는 의사와 상담하세요</p>
+          <p className="text-gray-400 mt-1">※ 정확한 정보는 의사와 상담하세요</p>
         </div>
       </div>
     </div>

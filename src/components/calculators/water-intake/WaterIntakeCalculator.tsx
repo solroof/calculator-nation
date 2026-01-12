@@ -1,20 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 type ActivityLevel = "low" | "moderate" | "high" | "very_high";
 
 export function WaterIntakeCalculator() {
-  const [weight, setWeight] = useState("70");
+  const [weight, setWeight] = useState<number>(70);
   const [activity, setActivity] = useState<ActivityLevel>("moderate");
   const [climate, setClimate] = useState<"normal" | "hot">("normal");
 
   const calculate = () => {
-    const w = parseFloat(weight);
-    if (isNaN(w) || w <= 0) return null;
+    if (weight <= 0) return null;
 
     // 기본: 체중 × 30ml
-    let baseWater = w * 30;
+    let baseWater = weight * 30;
 
     // 활동량에 따른 조정
     const activityMultiplier = {
@@ -63,13 +63,15 @@ export function WaterIntakeCalculator() {
 
       <div className="space-y-4 mb-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">체중 (kg)</label>
-          <input
-            type="number"
+          <label className="block text-sm font-medium text-gray-700 mb-1">체중</label>
+          <NumberInput
             value={weight}
-            onChange={(e) => setWeight(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 text-lg"
-            placeholder="체중 입력"
+            onChange={setWeight}
+            min={20}
+            max={200}
+            step={1}
+            format="none"
+            suffix="kg"
           />
         </div>
 
@@ -147,12 +149,16 @@ export function WaterIntakeCalculator() {
       )}
 
       <div className="mt-4 p-4 bg-gray-50 rounded-xl">
-        <p className="text-sm font-medium text-gray-700 mb-2">물 섭취 팁</p>
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
         <div className="text-xs text-gray-500 space-y-1">
-          <p>• 아침에 일어나자마자 물 한 잔</p>
-          <p>• 식사 30분 전에 물 마시기</p>
-          <p>• 커피/술 마신 후 추가 섭취 필요</p>
-          <p>• 소변 색이 옅은 노란색이면 적당</p>
+          <p>• 기본 섭취량 = 체중(kg) × 30ml</p>
+          <p>• 활동량 보정: 적음 ×1.0, 보통 ×1.2, 많음 ×1.4, 매우많음 ×1.6</p>
+          <p>• 더운 날씨: 추가 ×1.2</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">물 섭취 팁</p>
+          <p>• 아침 기상 시, 식사 30분 전 섭취 권장</p>
+          <p>• 소변 색이 옅은 노란색이면 적정</p>
         </div>
       </div>
     </div>

@@ -168,12 +168,19 @@ export function ParentalLeaveCalculator() {
             </div>
           </div>
 
-          {/* 안내 문구 */}
-          <div className="text-xs text-gray-500 space-y-1">
-            <p>* 2024년 육아휴직 급여 기준으로 계산됩니다.</p>
-            <p>* 첫 3개월: 통상임금 80% (상한 150만원, 하한 70만원)</p>
-            <p>* 4~12개월: 통상임금 50% (상한 120만원, 하한 70만원)</p>
-            <p>* 6+6 육휴: 첫 6개월 100% (최대 450만원)</p>
+          {/* 계산 공식 */}
+          <div className="p-4 bg-gray-50 rounded-xl">
+            <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>• 첫 3개월: 통상임금 × 80% (상한 150만원, 하한 70만원)</p>
+              <p>• 4~12개월: 통상임금 × 50% (상한 120만원, 하한 70만원)</p>
+              <p>• 6+6 육휴: 첫 6개월 통상임금 × 100% (최대 450만원)</p>
+            </div>
+            <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+              <p className="font-medium mb-1">2024년 기준</p>
+              <p>• 고용보험 가입 180일 이상 필요</p>
+              <p>• 자녀 만 8세 이하 또는 초등학교 2학년 이하</p>
+            </div>
           </div>
         </div>
       )}

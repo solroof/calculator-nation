@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 type Unit = "bit" | "byte" | "kb" | "mb" | "gb" | "tb" | "pb";
 
@@ -15,13 +16,12 @@ const units: { key: Unit; label: string; toByte: number }[] = [
 ];
 
 export function DataSizeCalculator() {
-  const [value, setValue] = useState("1");
+  const [value, setValue] = useState<number>(1);
   const [fromUnit, setFromUnit] = useState<Unit>("gb");
   const [toUnit, setToUnit] = useState<Unit>("mb");
 
   const convert = () => {
-    const num = parseFloat(value);
-    if (isNaN(num)) return 0;
+    const num = value || 0;
 
     const fromData = units.find((u) => u.key === fromUnit);
     const toData = units.find((u) => u.key === toUnit);
@@ -52,12 +52,12 @@ export function DataSizeCalculator() {
       <div className="space-y-4 mb-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">값 입력</label>
-          <input
-            type="number"
+          <NumberInput
             value={value}
-            onChange={(e) => setValue(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 text-lg"
-            placeholder="변환할 값"
+            onChange={setValue}
+            min={0}
+            step={1}
+            format="comma"
           />
         </div>
 
@@ -104,6 +104,20 @@ export function DataSizeCalculator() {
         <p className="text-white/70 text-sm mt-2">
           {value} {fromUnit.toUpperCase()} = {result.toLocaleString(undefined, { maximumFractionDigits: 4 })} {toUnit.toUpperCase()}
         </p>
+      </div>
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">변환 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 결과 = 입력값 × (기준단위 비율 / 변환단위 비율)</p>
+          <p>• 기준 단위: 바이트 (Byte)</p>
+          <p>• 8 bit = 1 Byte</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">2진법 단위 (1024 기준)</p>
+          <p>1 KB = 1,024 B | 1 MB = 1,024 KB</p>
+          <p>1 GB = 1,024 MB | 1 TB = 1,024 GB</p>
+        </div>
       </div>
     </div>
   );

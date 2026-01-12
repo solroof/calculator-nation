@@ -1,14 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-
-type ColorMode = "hex" | "rgb" | "hsl";
+import { useState } from "react";
 
 export function ColorConverter() {
   const [hex, setHex] = useState("3B82F6");
   const [rgb, setRgb] = useState({ r: 59, g: 130, b: 246 });
   const [hsl, setHsl] = useState({ h: 217, s: 91, l: 60 });
-  const [activeMode, setActiveMode] = useState<ColorMode>("hex");
 
   const hexToRgb = (hex: string): { r: number; g: number; b: number } | null => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -151,10 +148,7 @@ export function ColorConverter() {
             <input
               type="text"
               value={hex}
-              onChange={(e) => {
-                setActiveMode("hex");
-                updateFromHex(e.target.value);
-              }}
+              onChange={(e) => updateFromHex(e.target.value)}
               maxLength={6}
               className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl font-mono focus:ring-2 focus:ring-blue-500"
               placeholder="3B82F6"
@@ -177,10 +171,7 @@ export function ColorConverter() {
             <input
               type="number"
               value={rgb.r}
-              onChange={(e) => {
-                setActiveMode("rgb");
-                updateFromRgb(parseInt(e.target.value) || 0, rgb.g, rgb.b);
-              }}
+              onChange={(e) => updateFromRgb(parseInt(e.target.value) || 0, rgb.g, rgb.b)}
               min="0"
               max="255"
               className="w-full px-3 py-2 border border-gray-200 rounded-xl text-center"
@@ -192,10 +183,7 @@ export function ColorConverter() {
             <input
               type="number"
               value={rgb.g}
-              onChange={(e) => {
-                setActiveMode("rgb");
-                updateFromRgb(rgb.r, parseInt(e.target.value) || 0, rgb.b);
-              }}
+              onChange={(e) => updateFromRgb(rgb.r, parseInt(e.target.value) || 0, rgb.b)}
               min="0"
               max="255"
               className="w-full px-3 py-2 border border-gray-200 rounded-xl text-center"
@@ -207,10 +195,7 @@ export function ColorConverter() {
             <input
               type="number"
               value={rgb.b}
-              onChange={(e) => {
-                setActiveMode("rgb");
-                updateFromRgb(rgb.r, rgb.g, parseInt(e.target.value) || 0);
-              }}
+              onChange={(e) => updateFromRgb(rgb.r, rgb.g, parseInt(e.target.value) || 0)}
               min="0"
               max="255"
               className="w-full px-3 py-2 border border-gray-200 rounded-xl text-center"
@@ -235,10 +220,7 @@ export function ColorConverter() {
             <input
               type="number"
               value={hsl.h}
-              onChange={(e) => {
-                setActiveMode("hsl");
-                updateFromHsl(parseInt(e.target.value) || 0, hsl.s, hsl.l);
-              }}
+              onChange={(e) => updateFromHsl(parseInt(e.target.value) || 0, hsl.s, hsl.l)}
               min="0"
               max="360"
               className="w-full px-3 py-2 border border-gray-200 rounded-xl text-center"
@@ -250,10 +232,7 @@ export function ColorConverter() {
             <input
               type="number"
               value={hsl.s}
-              onChange={(e) => {
-                setActiveMode("hsl");
-                updateFromHsl(hsl.h, parseInt(e.target.value) || 0, hsl.l);
-              }}
+              onChange={(e) => updateFromHsl(hsl.h, parseInt(e.target.value) || 0, hsl.l)}
               min="0"
               max="100"
               className="w-full px-3 py-2 border border-gray-200 rounded-xl text-center"
@@ -265,10 +244,7 @@ export function ColorConverter() {
             <input
               type="number"
               value={hsl.l}
-              onChange={(e) => {
-                setActiveMode("hsl");
-                updateFromHsl(hsl.h, hsl.s, parseInt(e.target.value) || 0);
-              }}
+              onChange={(e) => updateFromHsl(hsl.h, hsl.s, parseInt(e.target.value) || 0)}
               min="0"
               max="100"
               className="w-full px-3 py-2 border border-gray-200 rounded-xl text-center"

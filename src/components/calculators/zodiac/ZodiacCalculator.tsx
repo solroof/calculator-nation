@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DatePicker } from "@/components/ui";
 
 const zodiacSigns = [
   { name: "물병자리", symbol: "♒", start: [1, 20], end: [2, 18], element: "공기", english: "Aquarius" },
@@ -85,11 +86,10 @@ export function ZodiacCalculator() {
 
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">생년월일</label>
-        <input
-          type="date"
+        <DatePicker
           value={birthDate}
-          onChange={(e) => setBirthDate(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500"
+          onChange={setBirthDate}
+          placeholder="생년월일 선택"
         />
       </div>
 
@@ -129,13 +129,20 @@ export function ZodiacCalculator() {
       )}
 
       <div className="mt-4 p-4 bg-gray-50 rounded-xl">
-        <p className="text-sm font-medium text-gray-700 mb-2">12간지 순서</p>
-        <div className="flex flex-wrap gap-1">
-          {chineseZodiac.map((z) => (
-            <span key={z.name} className="text-lg" title={z.name}>
-              {z.emoji}
-            </span>
-          ))}
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 띠 = (출생년도 - 4) mod 12</p>
+          <p>• 별자리 = 생월/일 기준 황도 12궁</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">12간지 순서</p>
+          <div className="flex flex-wrap gap-1">
+            {chineseZodiac.map((z) => (
+              <span key={z.name} className="text-lg" title={z.name}>
+                {z.emoji}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </div>

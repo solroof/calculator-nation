@@ -1,21 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 export function RatioCalculator() {
   const [mode, setMode] = useState<"proportion" | "scale" | "divide">("proportion");
-  const [a, setA] = useState("3");
-  const [b, setB] = useState("5");
-  const [c, setC] = useState("9");
-  const [d, setD] = useState("");
-  const [total, setTotal] = useState("1000");
-  const [ratio1, setRatio1] = useState("2");
-  const [ratio2, setRatio2] = useState("3");
+  const [a, setA] = useState<number>(3);
+  const [b, setB] = useState<number>(5);
+  const [c, setC] = useState<number>(9);
+  const [total, setTotal] = useState<number>(1000);
+  const [ratio1, setRatio1] = useState<number>(2);
+  const [ratio2, setRatio2] = useState<number>(3);
 
   const calculateProportion = () => {
-    const aVal = parseFloat(a) || 0;
-    const bVal = parseFloat(b) || 0;
-    const cVal = parseFloat(c) || 0;
+    const aVal = a || 0;
+    const bVal = b || 0;
+    const cVal = c || 0;
 
     if (aVal === 0) return { result: 0, valid: false };
 
@@ -25,8 +25,8 @@ export function RatioCalculator() {
   };
 
   const calculateScale = () => {
-    const aVal = parseFloat(a) || 0;
-    const bVal = parseFloat(b) || 0;
+    const aVal = a || 0;
+    const bVal = b || 0;
 
     if (bVal === 0) return { ratio: 0, simplified: "", valid: false };
 
@@ -41,9 +41,9 @@ export function RatioCalculator() {
   };
 
   const calculateDivide = () => {
-    const totalVal = parseFloat(total) || 0;
-    const r1 = parseFloat(ratio1) || 0;
-    const r2 = parseFloat(ratio2) || 0;
+    const totalVal = total || 0;
+    const r1 = ratio1 || 0;
+    const r2 = ratio2 || 0;
     const sum = r1 + r2;
 
     if (sum === 0) return { part1: 0, part2: 0, valid: false };
@@ -106,30 +106,30 @@ export function RatioCalculator() {
               </span>
             </div>
             <div className="grid grid-cols-4 gap-2 items-center">
-              <input
-                type="number"
+              <NumberInput
                 value={a}
-                onChange={(e) => setA(e.target.value)}
-                className="px-3 py-2 border border-gray-200 rounded-xl text-center"
-                placeholder="a"
+                onChange={setA}
+                min={0}
+                step={1}
+                format="none"
               />
               <span className="text-center text-gray-500">:</span>
-              <input
-                type="number"
+              <NumberInput
                 value={b}
-                onChange={(e) => setB(e.target.value)}
-                className="px-3 py-2 border border-gray-200 rounded-xl text-center"
-                placeholder="b"
+                onChange={setB}
+                min={0}
+                step={1}
+                format="none"
               />
               <span className="text-center text-gray-500">=</span>
             </div>
             <div className="grid grid-cols-4 gap-2 items-center">
-              <input
-                type="number"
+              <NumberInput
                 value={c}
-                onChange={(e) => setC(e.target.value)}
-                className="px-3 py-2 border border-gray-200 rounded-xl text-center"
-                placeholder="c"
+                onChange={setC}
+                min={0}
+                step={1}
+                format="none"
               />
               <span className="text-center text-gray-500">:</span>
               <div className="px-3 py-2 bg-teal-100 rounded-xl text-center font-bold text-teal-600">
@@ -143,20 +143,20 @@ export function RatioCalculator() {
         {mode === "scale" && (
           <>
             <div className="grid grid-cols-3 gap-2 items-center">
-              <input
-                type="number"
+              <NumberInput
                 value={a}
-                onChange={(e) => setA(e.target.value)}
-                className="px-3 py-2 border border-gray-200 rounded-xl text-center"
-                placeholder="첫번째 값"
+                onChange={setA}
+                min={0}
+                step={1}
+                format="none"
               />
               <span className="text-center text-gray-500">:</span>
-              <input
-                type="number"
+              <NumberInput
                 value={b}
-                onChange={(e) => setB(e.target.value)}
-                className="px-3 py-2 border border-gray-200 rounded-xl text-center"
-                placeholder="두번째 값"
+                onChange={setB}
+                min={0}
+                step={1}
+                format="none"
               />
             </div>
             <div className="bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl p-4 text-white text-center">
@@ -173,29 +173,29 @@ export function RatioCalculator() {
           <>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">전체 값</label>
-              <input
-                type="number"
+              <NumberInput
                 value={total}
-                onChange={(e) => setTotal(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl"
-                placeholder="1000"
+                onChange={setTotal}
+                min={0}
+                step={1}
+                format="comma"
               />
             </div>
             <div className="grid grid-cols-3 gap-2 items-center">
-              <input
-                type="number"
+              <NumberInput
                 value={ratio1}
-                onChange={(e) => setRatio1(e.target.value)}
-                className="px-3 py-2 border border-gray-200 rounded-xl text-center"
-                placeholder="비율1"
+                onChange={setRatio1}
+                min={0}
+                step={1}
+                format="none"
               />
               <span className="text-center text-gray-500">:</span>
-              <input
-                type="number"
+              <NumberInput
                 value={ratio2}
-                onChange={(e) => setRatio2(e.target.value)}
-                className="px-3 py-2 border border-gray-200 rounded-xl text-center"
-                placeholder="비율2"
+                onChange={setRatio2}
+                min={0}
+                step={1}
+                format="none"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -214,6 +214,15 @@ export function RatioCalculator() {
             </div>
           </>
         )}
+      </div>
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 비례식: a : b = c : x → x = (b × c) / a</p>
+          <p>• 비율: a : b = a/b (최대공약수로 기약분수)</p>
+          <p>• 비율 분배: 전체 × (비율 / 비율합)</p>
+        </div>
       </div>
     </div>
   );

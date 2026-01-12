@@ -1,55 +1,51 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput, MoneyInput } from "@/components/ui";
 
 type CalcMode = "economy" | "cost" | "distance";
 
 export function FuelEconomyCalculator() {
   const [mode, setMode] = useState<CalcMode>("economy");
-  const [distance, setDistance] = useState("500");
-  const [fuel, setFuel] = useState("50");
-  const [fuelPrice, setFuelPrice] = useState("1650");
-  const [fuelEconomy, setFuelEconomy] = useState("12");
+  const [distance, setDistance] = useState<number>(500);
+  const [fuel, setFuel] = useState<number>(50);
+  const [fuelPrice, setFuelPrice] = useState<number>(1650);
+  const [fuelEconomy, setFuelEconomy] = useState<number>(12);
 
   const calculate = () => {
-    const dist = parseFloat(distance);
-    const fuelAmount = parseFloat(fuel);
-    const price = parseFloat(fuelPrice);
-    const economy = parseFloat(fuelEconomy);
 
     switch (mode) {
       case "economy":
         // 연비 계산: 주행거리 / 주유량
-        if (isNaN(dist) || isNaN(fuelAmount) || fuelAmount <= 0) return null;
-        const calculatedEconomy = dist / fuelAmount;
+        if (fuel <= 0) return null;
+        const calculatedEconomy = distance / fuel;
         return {
           result: calculatedEconomy,
           unit: "km/L",
-          description: `${dist}km를 ${fuelAmount}L로 주행`,
+          description: `${distance}km를 ${fuel}L로 주행`,
           detail: `연비: ${calculatedEconomy.toFixed(2)} km/L`,
         };
 
       case "cost":
         // 주유비 계산: (주행거리 / 연비) * 유가
-        if (isNaN(dist) || isNaN(economy) || isNaN(price) || economy <= 0) return null;
-        const fuelNeeded = dist / economy;
-        const totalCost = fuelNeeded * price;
+        if (fuelEconomy <= 0) return null;
+        const fuelNeeded = distance / fuelEconomy;
+        const totalCost = fuelNeeded * fuelPrice;
         return {
           result: totalCost,
           unit: "원",
-          description: `${dist}km 주행 시 예상 주유비`,
+          description: `${distance}km 주행 시 예상 주유비`,
           detail: `필요 연료: ${fuelNeeded.toFixed(1)}L`,
         };
 
       case "distance":
         // 주행 가능 거리: 연료량 * 연비
-        if (isNaN(fuelAmount) || isNaN(economy)) return null;
-        const maxDistance = fuelAmount * economy;
+        const maxDistance = fuel * fuelEconomy;
         return {
           result: maxDistance,
           unit: "km",
-          description: `${fuelAmount}L로 주행 가능 거리`,
-          detail: `연비 ${economy}km/L 기준`,
+          description: `${fuel}L로 주행 가능 거리`,
+          detail: `연비 ${fuelEconomy}km/L 기준`,
         };
 
       default:
@@ -97,23 +93,25 @@ export function FuelEconomyCalculator() {
         {mode === "economy" && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">주행 거리 (km)</label>
-              <input
-                type="number"
+              <label className="block text-sm font-medium text-gray-700 mb-1">주행 거리</label>
+              <NumberInput
                 value={distance}
-                onChange={(e) => setDistance(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-slate-500 text-lg"
-                placeholder="예: 500"
+                onChange={setDistance}
+                min={0}
+                step={10}
+                format="comma"
+                suffix="km"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">주유량 (L)</label>
-              <input
-                type="number"
+              <label className="block text-sm font-medium text-gray-700 mb-1">주유량</label>
+              <NumberInput
                 value={fuel}
-                onChange={(e) => setFuel(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-slate-500 text-lg"
-                placeholder="예: 50"
+                onChange={setFuel}
+                min={0}
+                step={1}
+                format="none"
+                suffix="L"
               />
             </div>
           </>
@@ -122,33 +120,35 @@ export function FuelEconomyCalculator() {
         {mode === "cost" && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">주행 예정 거리 (km)</label>
-              <input
-                type="number"
+              <label className="block text-sm font-medium text-gray-700 mb-1">주행 예정 거리</label>
+              <NumberInput
                 value={distance}
-                onChange={(e) => setDistance(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-slate-500 text-lg"
-                placeholder="예: 500"
+                onChange={setDistance}
+                min={0}
+                step={10}
+                format="comma"
+                suffix="km"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">차량 연비 (km/L)</label>
-              <input
-                type="number"
+              <label className="block text-sm font-medium text-gray-700 mb-1">차량 연비</label>
+              <NumberInput
                 value={fuelEconomy}
-                onChange={(e) => setFuelEconomy(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-slate-500 text-lg"
-                placeholder="예: 12"
+                onChange={setFuelEconomy}
+                min={1}
+                max={50}
+                step={0.1}
+                format="none"
+                suffix="km/L"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">연료 가격 (원/L)</label>
-              <input
-                type="number"
+              <label className="block text-sm font-medium text-gray-700 mb-1">연료 가격</label>
+              <MoneyInput
                 value={fuelPrice}
-                onChange={(e) => setFuelPrice(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-slate-500 text-lg"
-                placeholder="예: 1650"
+                onChange={setFuelPrice}
+                step={10}
+                suffix="원/L"
               />
             </div>
           </>
@@ -157,23 +157,26 @@ export function FuelEconomyCalculator() {
         {mode === "distance" && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">연료량 (L)</label>
-              <input
-                type="number"
+              <label className="block text-sm font-medium text-gray-700 mb-1">연료량</label>
+              <NumberInput
                 value={fuel}
-                onChange={(e) => setFuel(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-slate-500 text-lg"
-                placeholder="예: 50"
+                onChange={setFuel}
+                min={0}
+                step={1}
+                format="none"
+                suffix="L"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">차량 연비 (km/L)</label>
-              <input
-                type="number"
+              <label className="block text-sm font-medium text-gray-700 mb-1">차량 연비</label>
+              <NumberInput
                 value={fuelEconomy}
-                onChange={(e) => setFuelEconomy(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-slate-500 text-lg"
-                placeholder="예: 12"
+                onChange={setFuelEconomy}
+                min={1}
+                max={50}
+                step={0.1}
+                format="none"
+                suffix="km/L"
               />
             </div>
           </>
@@ -190,6 +193,21 @@ export function FuelEconomyCalculator() {
           <p className="text-white/60 text-sm mt-2">{result.detail}</p>
         </div>
       )}
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 연비 = 주행거리(km) ÷ 주유량(L)</p>
+          <p>• 주유비 = (거리 ÷ 연비) × 유가</p>
+          <p>• 주행거리 = 연료량 × 연비</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">평균 연비 참고</p>
+          <p>• 경차: 15~18 km/L</p>
+          <p>• 소형차: 12~15 km/L</p>
+          <p>• 중형차: 10~13 km/L</p>
+        </div>
+      </div>
     </div>
   );
 }

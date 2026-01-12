@@ -88,6 +88,17 @@ export function CharacterCountCalculator() {
             </div>
           </div>
         </div>
+
+        {/* 계산 기준 */}
+        <div className="p-4 bg-gray-50 rounded-xl">
+          <p className="text-sm font-medium text-gray-700 mb-2">계산 기준</p>
+          <div className="text-xs text-gray-500 space-y-1">
+            <p>• 공백 포함 = 모든 문자 (공백, 줄바꿈 포함)</p>
+            <p>• 공백 제외 = 공백, 탭, 줄바꿈 제외</p>
+            <p>• 단어 = 공백으로 구분된 단어 수</p>
+            <p>• 바이트 = UTF-8 인코딩 기준 (한글 3바이트)</p>
+          </div>
+        </div>
       </div>
     </div>
   );

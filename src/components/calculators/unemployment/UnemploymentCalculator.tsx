@@ -3,16 +3,17 @@
 import { useState } from 'react';
 import { unemploymentCalculator } from '@/lib/math/unemployment-calculator';
 import type { UnemploymentResult } from '@/lib/types/unemployment';
+import { NumberInput, MoneyInput } from '@/components/ui';
 
 function formatWon(num: number): string {
   return num.toLocaleString('ko-KR') + '원';
 }
 
 export function UnemploymentCalculator() {
-  const [age, setAge] = useState<string>('35');
+  const [age, setAge] = useState<number>(35);
   const [isDisabled, setIsDisabled] = useState(false);
-  const [insuranceYears, setInsuranceYears] = useState<string>('3');
-  const [avgMonthlyWage, setAvgMonthlyWage] = useState<string>('3000000');
+  const [insuranceYears, setInsuranceYears] = useState<number>(3);
+  const [avgMonthlyWage, setAvgMonthlyWage] = useState<number>(3000000);
   const [result, setResult] = useState<UnemploymentResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,17 +21,17 @@ export function UnemploymentCalculator() {
     setError(null);
     setResult(null);
 
-    const years = parseFloat(insuranceYears);
+    const years = insuranceYears || 0;
     if (years < 1) {
       setError('고용보험 가입기간이 1년 이상이어야 실업급여 수급 가능합니다.');
       return;
     }
 
     const calcResult = unemploymentCalculator.calculate({
-      age: parseInt(age) || 35,
+      age: age || 35,
       isDisabled,
       insuranceYears: years,
-      avgMonthlyWage: parseInt(avgMonthlyWage.replace(/,/g, '')) || 0,
+      avgMonthlyWage: avgMonthlyWage || 0,
     });
 
     setResult(calcResult);
@@ -52,24 +53,26 @@ export function UnemploymentCalculator() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">나이</label>
-            <input
-              type="number"
+            <NumberInput
               value={age}
-              onChange={(e) => setAge(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
-              min="18"
-              max="65"
+              onChange={setAge}
+              min={18}
+              max={65}
+              step={1}
+              format="none"
+              suffix="세"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">가입기간 (년)</label>
-            <input
-              type="number"
+            <NumberInput
               value={insuranceYears}
-              onChange={(e) => setInsuranceYears(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
-              min="0"
-              step="0.5"
+              onChange={setInsuranceYears}
+              min={0}
+              max={40}
+              step={0.5}
+              format="none"
+              suffix="년"
             />
           </div>
         </div>
@@ -78,15 +81,12 @@ export function UnemploymentCalculator() {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             퇴직 전 3개월 평균 월급 (세전)
           </label>
-          <div className="relative">
-            <input
-              type="text"
-              value={parseInt(avgMonthlyWage || '0').toLocaleString()}
-              onChange={(e) => setAvgMonthlyWage(e.target.value.replace(/[^0-9]/g, ''))}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-lg font-medium focus:ring-2 focus:ring-blue-500"
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">원</span>
-          </div>
+          <MoneyInput
+            value={avgMonthlyWage}
+            onChange={setAvgMonthlyWage}
+            min={0}
+            step={100000}
+          />
         </div>
 
         <label className="flex items-center gap-2 cursor-pointer">
@@ -157,8 +157,15 @@ export function UnemploymentCalculator() {
         </div>
       )}
 
-      <div className="mt-6 py-4 text-center text-gray-400 text-xs border-t border-gray-100">
-        <p>2024년 기준 · 실제 수급액과 다를 수 있음</p>
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 일 실업급여 = 퇴직 전 3개월 평균임금 ÷ 90일 × 60%</p>
+          <p>• 상한액: 66,000원/일, 하한액: 최저임금 × 80% × 8시간</p>
+          <p>• 총 수령액 = 일 실업급여 × 소정급여일수</p>
+          <p>• 소정급여일수: 나이/장애 여부 + 가입기간에 따라 120~270일</p>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">2024년 고용보험법 기준</p>
       </div>
     </div>
   );

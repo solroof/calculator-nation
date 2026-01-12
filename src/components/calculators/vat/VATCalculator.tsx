@@ -1,36 +1,36 @@
 "use client";
 
 import { useState } from "react";
+import { MoneyInput } from "@/components/ui";
 
 type CalcMode = "addVat" | "removeVat" | "calculateVat";
 
 export function VATCalculator() {
   const [mode, setMode] = useState<CalcMode>("addVat");
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState<number>(0);
   const [vatRate] = useState(10);
 
   const calculate = () => {
-    const value = parseFloat(amount);
-    if (isNaN(value)) return null;
+    if (!amount || amount <= 0) return null;
 
     switch (mode) {
       case "addVat":
         return {
-          supply: value,
-          vat: value * (vatRate / 100),
-          total: value * (1 + vatRate / 100),
+          supply: amount,
+          vat: amount * (vatRate / 100),
+          total: amount * (1 + vatRate / 100),
         };
       case "removeVat":
         return {
-          total: value,
-          supply: value / (1 + vatRate / 100),
-          vat: value - value / (1 + vatRate / 100),
+          total: amount,
+          supply: amount / (1 + vatRate / 100),
+          vat: amount - amount / (1 + vatRate / 100),
         };
       case "calculateVat":
         return {
-          supply: value,
-          vat: value * (vatRate / 100),
-          total: value * (1 + vatRate / 100),
+          supply: amount,
+          vat: amount * (vatRate / 100),
+          total: amount * (1 + vatRate / 100),
         };
     }
   };
@@ -74,16 +74,13 @@ export function VATCalculator() {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {mode === "removeVat" ? "VAT 포함 금액 (합계)" : "공급가액 (VAT 별도)"}
           </label>
-          <div className="relative">
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-lg focus:ring-2 focus:ring-violet-500"
-              placeholder="100,000"
-            />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">원</span>
-          </div>
+          <MoneyInput
+            value={amount}
+            onChange={setAmount}
+            step={10000}
+            min={0}
+            placeholder="금액 입력"
+          />
         </div>
       </div>
 
@@ -111,6 +108,16 @@ export function VATCalculator() {
               <span className="font-medium text-gray-800">합계</span>
               <span className="font-bold">{formatWon(result.total)}</span>
             </div>
+          </div>
+
+          <div className="bg-gray-50 rounded-xl p-4">
+            <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>• VAT 포함: 합계 = 공급가 × 1.1</p>
+              <p>• VAT 분리: 공급가 = 합계 ÷ 1.1</p>
+              <p>• 부가세 = 공급가 × 10%</p>
+            </div>
+            <p className="text-xs text-gray-400 mt-2">부가가치세법 기준 (세율 10%)</p>
           </div>
         </div>
       )}

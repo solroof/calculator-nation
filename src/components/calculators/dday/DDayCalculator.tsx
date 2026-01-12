@@ -1,24 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
+import { DatePicker } from "@/components/ui/DatePicker";
 
 export function DDayCalculator() {
   const [targetDate, setTargetDate] = useState("");
   const [eventName, setEventName] = useState("");
-  const [result, setResult] = useState<{
-    days: number;
-    isPast: boolean;
-    weeks: number;
-    months: number;
-  } | null>(null);
 
-  useEffect(() => {
-    if (targetDate) {
-      calculateDDay();
-    }
-  }, [targetDate]);
+  const result = useMemo(() => {
+    if (!targetDate) return null;
 
-  const calculateDDay = () => {
     const target = new Date(targetDate);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -27,13 +18,13 @@ export function DDayCalculator() {
     const diffTime = target.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    setResult({
+    return {
       days: Math.abs(diffDays),
       isPast: diffDays < 0,
       weeks: Math.floor(Math.abs(diffDays) / 7),
       months: Math.floor(Math.abs(diffDays) / 30),
-    });
-  };
+    };
+  }, [targetDate]);
 
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "";
@@ -74,11 +65,10 @@ export function DDayCalculator() {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             날짜 선택
           </label>
-          <input
-            type="date"
+          <DatePicker
             value={targetDate}
-            onChange={(e) => setTargetDate(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+            onChange={setTargetDate}
+            placeholder="날짜를 선택하세요"
           />
         </div>
       </div>

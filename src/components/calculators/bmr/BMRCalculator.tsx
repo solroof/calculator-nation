@@ -4,22 +4,19 @@ import { useState, useMemo } from "react";
 import { bmrCalculator } from "@/lib/math/bmr-calculator";
 import { ACTIVITY_LEVELS } from "@/lib/types/bmr";
 import type { Gender, ActivityLevel } from "@/lib/types/bmr";
+import { NumberInput } from "@/components/ui";
 
 export function BMRCalculator() {
   const [gender, setGender] = useState<Gender>("male");
-  const [age, setAge] = useState<string>("30");
-  const [height, setHeight] = useState<string>("170");
-  const [weight, setWeight] = useState<string>("70");
+  const [age, setAge] = useState<number>(30);
+  const [height, setHeight] = useState<number>(170);
+  const [weight, setWeight] = useState<number>(70);
   const [activityLevel, setActivityLevel] = useState<ActivityLevel>("moderate");
 
   const result = useMemo(() => {
-    const a = parseInt(age) || 0;
-    const h = parseFloat(height) || 0;
-    const w = parseFloat(weight) || 0;
+    if (age <= 0 || height <= 0 || weight <= 0) return null;
 
-    if (a <= 0 || h <= 0 || w <= 0) return null;
-
-    return bmrCalculator.calculate({ gender, age: a, height: h, weight: w, activityLevel });
+    return bmrCalculator.calculate({ gender, age, height, weight, activityLevel });
   }, [gender, age, height, weight, activityLevel]);
 
   return (
@@ -60,35 +57,38 @@ export function BMRCalculator() {
         <div className="grid grid-cols-3 gap-2">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">나이</label>
-            <input
-              type="text"
-              inputMode="numeric"
+            <NumberInput
               value={age}
-              onChange={(e) => setAge(e.target.value.replace(/[^0-9]/g, ""))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-center"
-              placeholder="30"
+              onChange={setAge}
+              min={1}
+              max={120}
+              step={1}
+              format="none"
+              suffix="세"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">키 (cm)</label>
-            <input
-              type="text"
-              inputMode="decimal"
+            <label className="block text-sm font-medium text-gray-700 mb-2">키</label>
+            <NumberInput
               value={height}
-              onChange={(e) => setHeight(e.target.value.replace(/[^0-9.]/g, ""))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-center"
-              placeholder="170"
+              onChange={setHeight}
+              min={100}
+              max={250}
+              step={1}
+              format="none"
+              suffix="cm"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">몸무게 (kg)</label>
-            <input
-              type="text"
-              inputMode="decimal"
+            <label className="block text-sm font-medium text-gray-700 mb-2">몸무게</label>
+            <NumberInput
               value={weight}
-              onChange={(e) => setWeight(e.target.value.replace(/[^0-9.]/g, ""))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-center"
-              placeholder="70"
+              onChange={setWeight}
+              min={20}
+              max={200}
+              step={1}
+              format="none"
+              suffix="kg"
             />
           </div>
         </div>
@@ -146,8 +146,14 @@ export function BMRCalculator() {
             </div>
           </div>
 
-          <div className="text-xs text-gray-500">
-            * Mifflin-St Jeor 공식 기준으로 계산됩니다.
+          <div className="bg-gray-50 rounded-lg p-4">
+            <p className="text-sm font-medium text-gray-700 mb-2">계산 공식 (Mifflin-St Jeor)</p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>• 남성: BMR = 10×체중(kg) + 6.25×키(cm) - 5×나이 + 5</p>
+              <p>• 여성: BMR = 10×체중(kg) + 6.25×키(cm) - 5×나이 - 161</p>
+              <p>• TDEE = BMR × 활동계수</p>
+              <p className="pl-3 mt-1">활동계수: 비활동 1.2 ~ 매우활동적 1.9</p>
+            </div>
           </div>
         </div>
       )}

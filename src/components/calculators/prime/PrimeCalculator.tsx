@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 type Mode = "check" | "factorize" | "list";
 
 export function PrimeCalculator() {
   const [mode, setMode] = useState<Mode>("check");
-  const [number, setNumber] = useState("97");
-  const [rangeStart, setRangeStart] = useState("1");
-  const [rangeEnd, setRangeEnd] = useState("100");
+  const [number, setNumber] = useState<number>(97);
+  const [rangeStart, setRangeStart] = useState<number>(1);
+  const [rangeEnd, setRangeEnd] = useState<number>(100);
 
   const isPrime = (n: number): boolean => {
     if (n < 2) return false;
@@ -42,8 +43,8 @@ export function PrimeCalculator() {
   };
 
   const checkResult = () => {
-    const num = parseInt(number);
-    if (isNaN(num) || num < 1) return null;
+    const num = number || 0;
+    if (num < 1) return null;
 
     const prime = isPrime(num);
     const factors = factorize(num);
@@ -52,9 +53,9 @@ export function PrimeCalculator() {
   };
 
   const listResult = () => {
-    const start = parseInt(rangeStart);
-    const end = parseInt(rangeEnd);
-    if (isNaN(start) || isNaN(end) || start > end) return null;
+    const start = rangeStart || 0;
+    const end = rangeEnd || 0;
+    if (start > end) return null;
 
     const primes = getPrimesInRange(start, end);
     return { primes, count: primes.length };
@@ -100,35 +101,34 @@ export function PrimeCalculator() {
       {mode !== "list" ? (
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">숫자 입력</label>
-          <input
-            type="number"
+          <NumberInput
             value={number}
-            onChange={(e) => setNumber(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-lg"
-            placeholder="숫자 입력"
-            min="1"
+            onChange={setNumber}
+            min={1}
+            step={1}
+            format="comma"
           />
         </div>
       ) : (
         <div className="mb-4 grid grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">시작</label>
-            <input
-              type="number"
+            <NumberInput
               value={rangeStart}
-              onChange={(e) => setRangeStart(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500"
-              min="1"
+              onChange={setRangeStart}
+              min={1}
+              step={1}
+              format="comma"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">끝</label>
-            <input
-              type="number"
+            <NumberInput
               value={rangeEnd}
-              onChange={(e) => setRangeEnd(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500"
-              min="1"
+              onChange={setRangeEnd}
+              min={1}
+              step={1}
+              format="comma"
             />
           </div>
         </div>
@@ -193,10 +193,15 @@ export function PrimeCalculator() {
       )}
 
       <div className="mt-4 p-4 bg-gray-50 rounded-xl">
-        <p className="text-sm font-medium text-gray-700 mb-2">소수란?</p>
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
         <div className="text-xs text-gray-500 space-y-1">
+          <p>• 소수 판별: √n까지의 수로 나누어 확인</p>
+          <p>• 소인수분해: 2부터 √n까지 순차적으로 나눔</p>
+          <p>• n = p₁^a₁ × p₂^a₂ × ... × pₖ^aₖ</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200 space-y-1">
+          <p className="font-medium">소수란?</p>
           <p>• 1과 자기 자신으로만 나누어지는 1보다 큰 자연수</p>
-          <p>• 가장 작은 소수: 2 (유일한 짝수 소수)</p>
           <p>• 예: 2, 3, 5, 7, 11, 13, 17, 19, 23...</p>
         </div>
       </div>

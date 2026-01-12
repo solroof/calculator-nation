@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 type Gender = "male" | "female";
 
@@ -25,7 +26,7 @@ const drinks: Drink[] = [
 
 export function AlcoholCalculator() {
   const [gender, setGender] = useState<Gender>("male");
-  const [weight, setWeight] = useState("70");
+  const [weight, setWeight] = useState<number>(70);
   const [selectedDrinks, setSelectedDrinks] = useState<{ drink: Drink; count: number }[]>([]);
 
   const addDrink = (drink: Drink) => {
@@ -58,8 +59,7 @@ export function AlcoholCalculator() {
   };
 
   const calculate = () => {
-    const w = parseFloat(weight);
-    if (isNaN(w) || w <= 0 || selectedDrinks.length === 0) return null;
+    if (weight <= 0 || selectedDrinks.length === 0) return null;
 
     // 총 알코올 섭취량 (g)
     const totalAlcohol = selectedDrinks.reduce((sum, { drink, count }) => {
@@ -69,7 +69,7 @@ export function AlcoholCalculator() {
 
     // Widmark 공식
     const r = gender === "male" ? 0.68 : 0.55; // 체내 수분 비율
-    const bac = (totalAlcohol / (w * r * 10)); // 혈중 알코올 농도 (%)
+    const bac = (totalAlcohol / (weight * r * 10)); // 혈중 알코올 농도 (%)
 
     // 알코올 분해 속도: 시간당 0.015%
     const metabolismRate = 0.015;
@@ -143,12 +143,15 @@ export function AlcoholCalculator() {
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">체중 (kg)</label>
-        <input
-          type="number"
+        <label className="block text-sm font-medium text-gray-700 mb-1">체중</label>
+        <NumberInput
           value={weight}
-          onChange={(e) => setWeight(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-500"
+          onChange={setWeight}
+          min={20}
+          max={200}
+          step={1}
+          format="none"
+          suffix="kg"
         />
       </div>
 
@@ -234,8 +237,23 @@ export function AlcoholCalculator() {
         </div>
       )}
 
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식 (Widmark)</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 알코올량(g) = 용량(ml) × 도수 × 0.8</p>
+          <p>• BAC(%) = 알코올량 ÷ (체중 × r × 10)</p>
+          <p>• r: 남성 0.68, 여성 0.55 (체내수분비율)</p>
+          <p>• 분해속도: 시간당 0.015%</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">음주운전 기준</p>
+          <p>• 0.03% 이상: 면허정지</p>
+          <p>• 0.08% 이상: 면허취소</p>
+        </div>
+      </div>
+
       <div className="mt-4 p-4 bg-red-50 rounded-xl">
-        <p className="text-sm font-medium text-red-700 mb-2">⚠️ 주의사항</p>
+        <p className="text-sm font-medium text-red-700 mb-2">주의사항</p>
         <div className="text-xs text-red-600 space-y-1">
           <p>• 음주 후 운전은 절대 금지!</p>
           <p>• 개인차가 있어 참고용으로만 사용</p>

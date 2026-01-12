@@ -1,30 +1,27 @@
 "use client";
 
 import { useState } from "react";
+import { MoneyInput, PercentInput, NumberInput } from "@/components/ui";
 
 export function TipCalculator() {
-  const [billAmount, setBillAmount] = useState("50000");
-  const [tipPercent, setTipPercent] = useState("10");
-  const [people, setPeople] = useState("4");
+  const [billAmount, setBillAmount] = useState<number>(50000);
+  const [tipPercent, setTipPercent] = useState<number>(10);
+  const [people, setPeople] = useState<number>(4);
 
   const calculate = () => {
-    const bill = parseFloat(billAmount);
-    const tip = parseFloat(tipPercent);
-    const numPeople = parseInt(people);
+    if (billAmount <= 0 || tipPercent < 0 || people <= 0) return null;
 
-    if (isNaN(bill) || isNaN(tip) || isNaN(numPeople) || numPeople <= 0) return null;
-
-    const tipAmount = bill * (tip / 100);
-    const total = bill + tipAmount;
-    const perPerson = total / numPeople;
-    const tipPerPerson = tipAmount / numPeople;
+    const tipAmount = billAmount * (tipPercent / 100);
+    const total = billAmount + tipAmount;
+    const perPerson = total / people;
+    const tipPerPerson = tipAmount / people;
 
     return {
       tipAmount: Math.round(tipAmount),
       total: Math.round(total),
       perPerson: Math.round(perPerson),
       tipPerPerson: Math.round(tipPerPerson),
-      billPerPerson: Math.round(bill / numPeople),
+      billPerPerson: Math.round(billAmount / people),
     };
   };
 
@@ -44,13 +41,12 @@ export function TipCalculator() {
 
       <div className="space-y-4 mb-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">총 금액 (원)</label>
-          <input
-            type="number"
+          <label className="block text-sm font-medium text-gray-700 mb-1">총 금액</label>
+          <MoneyInput
             value={billAmount}
-            onChange={(e) => setBillAmount(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 text-lg"
-            placeholder="50000"
+            onChange={setBillAmount}
+            step={10000}
+            placeholder="총 금액 입력"
           />
         </div>
 
@@ -60,9 +56,9 @@ export function TipCalculator() {
             {quickTips.map((t) => (
               <button
                 key={t}
-                onClick={() => setTipPercent(t.toString())}
+                onClick={() => setTipPercent(t)}
                 className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
-                  tipPercent === t.toString()
+                  tipPercent === t
                     ? "bg-violet-500 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
@@ -71,39 +67,25 @@ export function TipCalculator() {
               </button>
             ))}
           </div>
-          <input
-            type="number"
+          <PercentInput
             value={tipPercent}
-            onChange={(e) => setTipPercent(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500"
-            placeholder="10"
-            min="0"
+            onChange={setTipPercent}
+            max={100}
+            step={1}
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">인원 수</label>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setPeople(Math.max(1, parseInt(people) - 1).toString())}
-              className="w-12 h-12 bg-gray-100 rounded-xl text-xl font-medium hover:bg-gray-200"
-            >
-              -
-            </button>
-            <input
-              type="number"
-              value={people}
-              onChange={(e) => setPeople(e.target.value)}
-              className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 text-center text-lg"
-              min="1"
-            />
-            <button
-              onClick={() => setPeople((parseInt(people) + 1).toString())}
-              className="w-12 h-12 bg-gray-100 rounded-xl text-xl font-medium hover:bg-gray-200"
-            >
-              +
-            </button>
-          </div>
+          <NumberInput
+            value={people}
+            onChange={setPeople}
+            min={1}
+            max={100}
+            step={1}
+            format="none"
+            suffix="명"
+          />
         </div>
       </div>
 
@@ -135,6 +117,16 @@ export function TipCalculator() {
           </div>
         </div>
       )}
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 팁 금액 = 총 금액 × 팁률(%)</p>
+          <p>• 총 지불액 = 총 금액 + 팁 금액</p>
+          <p>• 1인당 금액 = 총 지불액 ÷ 인원 수</p>
+          <p>• 1인당 팁 = 팁 금액 ÷ 인원 수</p>
+        </div>
+      </div>
     </div>
   );
 }

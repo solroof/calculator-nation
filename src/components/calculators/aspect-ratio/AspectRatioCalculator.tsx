@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 const commonRatios = [
   { name: "1:1", width: 1, height: 1, desc: "정사각형, 인스타그램" },
@@ -15,10 +16,10 @@ const commonRatios = [
 
 export function AspectRatioCalculator() {
   const [mode, setMode] = useState<"calculate" | "resize">("calculate");
-  const [width, setWidth] = useState("1920");
-  const [height, setHeight] = useState("1080");
-  const [targetWidth, setTargetWidth] = useState("1280");
-  const [targetHeight, setTargetHeight] = useState("");
+  const [width, setWidth] = useState<number>(1920);
+  const [height, setHeight] = useState<number>(1080);
+  const [targetWidth, setTargetWidth] = useState<number>(1280);
+  const [targetHeight, setTargetHeight] = useState<number>(720);
   const [lockAxis, setLockAxis] = useState<"width" | "height">("width");
 
   // 최대공약수
@@ -26,17 +27,15 @@ export function AspectRatioCalculator() {
 
   // 비율 계산
   const calculateRatio = () => {
-    const w = parseInt(width) || 0;
-    const h = parseInt(height) || 0;
-    if (w === 0 || h === 0) return { ratio: "0:0", decimal: 0, simplified: "0:0" };
+    if (width === 0 || height === 0) return { ratio: "0:0", decimal: 0, simplified: "0:0" };
 
-    const g = gcd(w, h);
-    const ratioW = w / g;
-    const ratioH = h / g;
-    const decimal = w / h;
+    const g = gcd(width, height);
+    const ratioW = width / g;
+    const ratioH = height / g;
+    const decimal = width / height;
 
     return {
-      ratio: `${w}:${h}`,
+      ratio: `${width}:${height}`,
       decimal: decimal.toFixed(4),
       simplified: `${ratioW}:${ratioH}`,
     };
@@ -44,19 +43,14 @@ export function AspectRatioCalculator() {
 
   // 크기 재조정
   const calculateResize = () => {
-    const w = parseInt(width) || 0;
-    const h = parseInt(height) || 0;
-    const tw = parseInt(targetWidth) || 0;
-    const th = parseInt(targetHeight) || 0;
+    if (width === 0 || height === 0) return { newWidth: 0, newHeight: 0 };
 
-    if (w === 0 || h === 0) return { newWidth: 0, newHeight: 0 };
+    const ratio = width / height;
 
-    const ratio = w / h;
-
-    if (lockAxis === "width" && tw > 0) {
-      return { newWidth: tw, newHeight: Math.round(tw / ratio) };
-    } else if (lockAxis === "height" && th > 0) {
-      return { newWidth: Math.round(th * ratio), newHeight: th };
+    if (lockAxis === "width" && targetWidth > 0) {
+      return { newWidth: targetWidth, newHeight: Math.round(targetWidth / ratio) };
+    } else if (lockAxis === "height" && targetHeight > 0) {
+      return { newWidth: Math.round(targetHeight * ratio), newHeight: targetHeight };
     }
 
     return { newWidth: 0, newHeight: 0 };
@@ -67,10 +61,8 @@ export function AspectRatioCalculator() {
 
   // 일반 비율 매칭
   const matchedRatio = commonRatios.find((r) => {
-    const w = parseInt(width) || 0;
-    const h = parseInt(height) || 0;
-    const g = gcd(w, h);
-    return w / g === r.width && h / g === r.height;
+    const g = gcd(width, height);
+    return width / g === r.width && height / g === r.height;
   });
 
   return (
@@ -109,21 +101,25 @@ export function AspectRatioCalculator() {
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">가로 (px)</label>
-            <input
-              type="number"
+            <label className="block text-sm font-medium text-gray-700 mb-1">가로</label>
+            <NumberInput
               value={width}
-              onChange={(e) => setWidth(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-center"
+              onChange={setWidth}
+              min={0}
+              step={1}
+              format="comma"
+              suffix="px"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">세로 (px)</label>
-            <input
-              type="number"
+            <label className="block text-sm font-medium text-gray-700 mb-1">세로</label>
+            <NumberInput
               value={height}
-              onChange={(e) => setHeight(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-center"
+              onChange={setHeight}
+              min={0}
+              step={1}
+              format="comma"
+              suffix="px"
             />
           </div>
         </div>
@@ -168,17 +164,19 @@ export function AspectRatioCalculator() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                {lockAxis === "width" ? "새 가로 크기 (px)" : "새 세로 크기 (px)"}
+                {lockAxis === "width" ? "새 가로 크기" : "새 세로 크기"}
               </label>
-              <input
-                type="number"
+              <NumberInput
                 value={lockAxis === "width" ? targetWidth : targetHeight}
-                onChange={(e) =>
+                onChange={(val) =>
                   lockAxis === "width"
-                    ? setTargetWidth(e.target.value)
-                    : setTargetHeight(e.target.value)
+                    ? setTargetWidth(val)
+                    : setTargetHeight(val)
                 }
-                className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500"
+                min={0}
+                step={1}
+                format="comma"
+                suffix="px"
               />
             </div>
 
@@ -199,8 +197,8 @@ export function AspectRatioCalculator() {
             <button
               key={r.name}
               onClick={() => {
-                setWidth(String(r.width * 100));
-                setHeight(String(r.height * 100));
+                setWidth(r.width * 100);
+                setHeight(r.height * 100);
               }}
               className="p-2 bg-white rounded-lg text-left hover:bg-indigo-100 transition-colors"
             >
@@ -208,6 +206,16 @@ export function AspectRatioCalculator() {
               <span className="text-gray-500 ml-1">{r.desc}</span>
             </button>
           ))}
+        </div>
+      </div>
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 비율 = 가로 : 세로</p>
+          <p>• 단순화 = GCD(가로, 세로)로 나눔</p>
+          <p>• 비율값 = 가로 ÷ 세로</p>
+          <p>• 크기 조정: 새 높이 = 새 가로 ÷ 비율값</p>
         </div>
       </div>
     </div>

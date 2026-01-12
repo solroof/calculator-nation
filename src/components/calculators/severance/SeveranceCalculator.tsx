@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { severanceCalculator } from '@/lib/math/severance-calculator';
 import type { SeveranceResult } from '@/lib/types/severance';
+import { DatePicker } from "@/components/ui";
 
 function formatWon(num: number): string {
   return num.toLocaleString('ko-KR') + '원';
@@ -81,22 +82,20 @@ export function SeveranceCalculator() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">입사일</label>
-            <input
-              type="date"
+            <DatePicker
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              max={today}
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              onChange={setStartDate}
+              maxDate={today}
+              placeholder="입사일 선택"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">퇴사일</label>
-            <input
-              type="date"
+            <DatePicker
               value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              max={today}
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              onChange={setEndDate}
+              maxDate={today}
+              placeholder="퇴사일 선택"
             />
           </div>
         </div>
@@ -244,9 +243,18 @@ export function SeveranceCalculator() {
         </div>
       )}
 
-      {/* Footer */}
-      <div className="mt-6 py-4 text-center text-gray-400 text-xs border-t border-gray-100">
-        <p>근로기준법 기준 · 평균임금 산정</p>
+      {/* 계산 공식 */}
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 1일 평균임금 = 최근 3개월 총 임금 ÷ 해당 기간 총 일수</p>
+          <p>• 퇴직금 = 1일 평균임금 × 30일 × (근속일수 ÷ 365)</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200 space-y-1">
+          <p>• 3개월 총 임금 = 급여 + 상여금(연간/4) + 수당(연간/4)</p>
+          <p>• 1년 미만 근무도 비례 계산</p>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">근로기준법 기준</p>
       </div>
     </div>
   );

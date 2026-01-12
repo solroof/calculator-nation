@@ -205,8 +205,13 @@ export function CalorieCalculator() {
       </div>
 
       <div className="mt-4 p-4 bg-gray-50 rounded-xl">
-        <p className="text-sm font-medium text-gray-700 mb-2">하루 권장 칼로리</p>
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
         <div className="text-xs text-gray-500 space-y-1">
+          <p>• 총 칼로리 = Σ(음식별 칼로리 × 수량)</p>
+          <p>• 소모 시간 = 총 칼로리 ÷ 시간당 소모 칼로리</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">하루 권장 칼로리</p>
           <p>• 성인 남성: 2,000~2,500 kcal</p>
           <p>• 성인 여성: 1,600~2,000 kcal</p>
         </div>

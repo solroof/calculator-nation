@@ -53,7 +53,7 @@ export function StatisticsCalculator() {
     });
     const maxFreq = Math.max(...Object.values(freq));
     const modes = Object.entries(freq)
-      .filter(([_, count]) => count === maxFreq)
+      .filter(([, count]) => count === maxFreq)
       .map(([num]) => parseFloat(num));
     const modeStr = maxFreq === 1 ? "없음" : modes.slice(0, 3).join(", ") + (modes.length > 3 ? "..." : "");
 
@@ -188,6 +188,17 @@ export function StatisticsCalculator() {
                   <p className="font-mono">{result.stdDev.toFixed(4)}</p>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+            <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>• 평균: x̄ = Σxᵢ / n</p>
+              <p>• 모분산: σ² = Σ(xᵢ - x̄)² / n</p>
+              <p>• 표본분산: s² = Σ(xᵢ - x̄)² / (n-1)</p>
+              <p>• 표준편차: σ = √분산</p>
+              <p>• 중앙값: 정렬 후 중앙값</p>
             </div>
           </div>
         </>

@@ -172,6 +172,8 @@ const popularCalculators = [
   { name: "대출 이자", href: "/loan", icon: "🏦", color: "emerald", desc: "상환액 계산" },
   { name: "BMI 계산기", href: "/bmi", icon: "⚖️", color: "rose", desc: "체질량지수" },
   { name: "D-Day", href: "/dday", icon: "📅", color: "amber", desc: "날짜 카운트" },
+  { name: "환율 계산기", href: "/currency", icon: "💱", color: "violet", desc: "통화 환전" },
+  { name: "퍼센트 계산기", href: "/percent", icon: "％", color: "cyan", desc: "퍼센트 계산" },
 ];
 
 export default function Home() {
@@ -179,7 +181,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <div className="max-w-lg mx-auto px-4 py-6">
+      {/* 모바일 레이아웃 */}
+      <div className="lg:hidden max-w-lg mx-auto px-4 py-6">
         {/* 히어로 섹션 */}
         <section className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium mb-3">
@@ -200,7 +203,7 @@ export default function Home() {
             <h2 className="text-sm font-bold text-gray-800">🔥 인기 계산기</h2>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {popularCalculators.map((calc) => {
+            {popularCalculators.slice(0, 4).map((calc) => {
               const colors = colorClasses[calc.color];
               return (
                 <Link
@@ -265,6 +268,95 @@ export default function Home() {
         <footer className="text-center py-8 border-t border-gray-100 mt-8">
           <p className="text-gray-400 text-xs mb-2">© 2024 계산기나라</p>
           <p className="text-gray-300 text-xs">모든 계산 결과는 참고용입니다</p>
+        </footer>
+      </div>
+
+      {/* PC 레이아웃 */}
+      <div className="hidden lg:block max-w-7xl mx-auto px-6 py-10">
+        {/* 히어로 섹션 */}
+        <section className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+            <span>🧮</span>
+            <span>{totalCalculators}개의 무료 계산기</span>
+          </div>
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">
+            계산기나라
+          </h1>
+          <p className="text-gray-500 text-lg">
+            필요한 모든 계산을 쉽고 빠르게
+          </p>
+        </section>
+
+        {/* 인기 계산기 */}
+        <section className="mb-12">
+          <h2 className="text-lg font-bold text-gray-800 mb-4">🔥 인기 계산기</h2>
+          <div className="grid grid-cols-6 gap-4">
+            {popularCalculators.map((calc) => {
+              const colors = colorClasses[calc.color];
+              return (
+                <Link
+                  key={calc.href}
+                  href={calc.href}
+                  className={`bg-gradient-to-br ${colors.gradient} rounded-2xl p-5 text-white hover:shadow-lg hover:scale-[1.02] transition-all`}
+                >
+                  <span className="text-3xl mb-3 block">{calc.icon}</span>
+                  <p className="font-bold">{calc.name}</p>
+                  <p className="text-white/70 text-sm mt-1">{calc.desc}</p>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* 카테고리별 계산기 - 2열 그리드 */}
+        <div className="grid grid-cols-2 gap-6">
+          {calculatorCategories.map((category) => {
+            const colors = colorClasses[category.color];
+            return (
+              <section key={category.name} className="mb-2">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-lg">{category.icon}</span>
+                  <h2 className="text-base font-bold text-gray-800">{category.name}</h2>
+                  <span className="text-sm text-gray-400">({category.items.length})</span>
+                </div>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                  <div className="grid grid-cols-2">
+                    {category.items.map((item, idx) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={`flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 ${
+                          idx % 2 === 0 ? "border-r" : ""
+                        }`}
+                      >
+                        <span className={`w-10 h-10 ${colors.light} rounded-xl flex items-center justify-center text-lg`}>
+                          {item.icon}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <p className="font-medium text-gray-800">{item.name}</p>
+                            {item.hot && (
+                              <span className="px-1.5 py-0.5 bg-red-100 text-red-600 text-[10px] font-bold rounded">HOT</span>
+                            )}
+                            {item.isNew && (
+                              <span className="px-1.5 py-0.5 bg-blue-100 text-blue-600 text-[10px] font-bold rounded">NEW</span>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-400 truncate">{item.description}</p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            );
+          })}
+        </div>
+
+        {/* 푸터 */}
+        <footer className="text-center py-12 border-t border-gray-100 mt-12">
+          <p className="text-gray-400 text-sm mb-2">© 2024 계산기나라</p>
+          <p className="text-gray-300 text-sm">모든 계산 결과는 참고용입니다</p>
         </footer>
       </div>
     </div>

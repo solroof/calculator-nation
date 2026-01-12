@@ -1,16 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 export function QuadraticCalculator() {
-  const [a, setA] = useState("1");
-  const [b, setB] = useState("-5");
-  const [c, setC] = useState("6");
+  const [a, setA] = useState<number>(1);
+  const [b, setB] = useState<number>(-5);
+  const [c, setC] = useState<number>(6);
 
   const calculate = () => {
-    const aVal = parseFloat(a) || 0;
-    const bVal = parseFloat(b) || 0;
-    const cVal = parseFloat(c) || 0;
+    const aVal = a || 0;
+    const bVal = b || 0;
+    const cVal = c || 0;
 
     if (aVal === 0) {
       // 일차방정식
@@ -45,9 +46,9 @@ export function QuadraticCalculator() {
 
   // 방정식 문자열 생성
   const getEquation = () => {
-    const aVal = parseFloat(a) || 0;
-    const bVal = parseFloat(b) || 0;
-    const cVal = parseFloat(c) || 0;
+    const aVal = a || 0;
+    const bVal = b || 0;
+    const cVal = c || 0;
 
     let eq = "";
     if (aVal !== 0) eq += `${aVal === 1 ? "" : aVal === -1 ? "-" : aVal}x²`;
@@ -80,29 +81,29 @@ export function QuadraticCalculator() {
         <div className="grid grid-cols-3 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">a (x²의 계수)</label>
-            <input
-              type="number"
+            <NumberInput
               value={a}
-              onChange={(e) => setA(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-center"
+              onChange={setA}
+              step={1}
+              format="none"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">b (x의 계수)</label>
-            <input
-              type="number"
+            <NumberInput
               value={b}
-              onChange={(e) => setB(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-center"
+              onChange={setB}
+              step={1}
+              format="none"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">c (상수항)</label>
-            <input
-              type="number"
+            <NumberInput
               value={c}
-              onChange={(e) => setC(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 text-center"
+              onChange={setC}
+              step={1}
+              format="none"
             />
           </div>
         </div>
@@ -158,9 +159,20 @@ export function QuadraticCalculator() {
         </div>
       )}
 
-      <div className="mt-4 p-3 bg-indigo-50 rounded-xl">
-        <p className="text-sm font-medium text-indigo-800 mb-1">근의 공식</p>
-        <p className="text-xs text-gray-600 font-mono">x = (-b ± √(b²-4ac)) / 2a</p>
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 근의 공식: x = (-b ± √(b²-4ac)) / 2a</p>
+          <p>• 판별식: D = b² - 4ac</p>
+          <p>• D &gt; 0: 서로 다른 두 실근</p>
+          <p>• D = 0: 중근 (x = -b/2a)</p>
+          <p>• D &lt; 0: 허근 (복소수)</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">근과 계수의 관계</p>
+          <p>• 두 근의 합: x₁ + x₂ = -b/a</p>
+          <p>• 두 근의 곱: x₁ × x₂ = c/a</p>
+        </div>
       </div>
     </div>
   );

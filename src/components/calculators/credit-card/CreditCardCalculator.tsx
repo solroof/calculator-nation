@@ -1,17 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { MoneyInput, PercentInput } from "@/components/ui";
 
 export function CreditCardCalculator() {
-  const [principal, setPrincipal] = useState("1000000");
+  const [principal, setPrincipal] = useState<number>(1000000);
   const [months, setMonths] = useState("12");
-  const [rate, setRate] = useState("15");
+  const [rate, setRate] = useState<number>(15);
   const [calcType, setCalcType] = useState<"installment" | "revolving">("installment");
 
   const calculate = () => {
-    const p = parseFloat(principal) || 0;
+    const p = principal || 0;
     const n = parseInt(months) || 1;
-    const annualRate = parseFloat(rate) || 0;
+    const annualRate = rate || 0;
     const monthlyRate = annualRate / 100 / 12;
 
     if (calcType === "installment") {
@@ -129,13 +130,12 @@ export function CreditCardCalculator() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">결제 금액 (원)</label>
-          <input
-            type="number"
+          <label className="block text-sm font-medium text-gray-700 mb-1">결제 금액</label>
+          <MoneyInput
             value={principal}
-            onChange={(e) => setPrincipal(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 text-lg"
-            placeholder="1000000"
+            onChange={setPrincipal}
+            min={0}
+            step={10000}
           />
         </div>
 
@@ -155,14 +155,13 @@ export function CreditCardCalculator() {
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">연이율 (%)</label>
-          <input
-            type="number"
-            step="0.1"
+          <label className="block text-sm font-medium text-gray-700 mb-1">연이율</label>
+          <PercentInput
             value={rate}
-            onChange={(e) => setRate(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500"
-            placeholder="15"
+            onChange={setRate}
+            min={0}
+            max={30}
+            step={0.1}
           />
           <p className="text-xs text-gray-400 mt-1">카드사별 할부 수수료율 확인 필요</p>
         </div>
@@ -215,6 +214,20 @@ export function CreditCardCalculator() {
           </div>
         </div>
       )}
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p className="font-medium">할부 (원리금균등)</p>
+          <p>• 월 납입금 = P × r × (1+r)ⁿ ÷ [(1+r)ⁿ - 1]</p>
+          <p className="pl-3">P: 원금, r: 월이율, n: 개월수</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200 space-y-1">
+          <p className="font-medium">리볼빙</p>
+          <p>• 최소결제금액 = 잔액 × 10% (최소 1만원)</p>
+          <p>• 월 이자 = 잔액 × (연이율 ÷ 12)</p>
+        </div>
+      </div>
     </div>
   );
 }

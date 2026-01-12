@@ -182,6 +182,20 @@ export function GPACalculator() {
           </div>
         </div>
       )}
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• GPA = Σ(과목별 학점 × 성적점수) ÷ 총 이수학점</p>
+          <p>• 백분율 = (GPA ÷ 만점) × 100</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">학점 체계</p>
+          <p>• 4.5만점: A+ 4.5, A0 4.0, B+ 3.5 ...</p>
+          <p>• 4.3만점: A+ 4.3, A0 4.0, A- 3.7 ...</p>
+          <p>• 4.0만점: A 4.0, B 3.0, C 2.0 ...</p>
+        </div>
+      </div>
     </div>
   );
 }

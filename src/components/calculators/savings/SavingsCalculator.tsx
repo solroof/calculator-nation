@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { savingsCalculator } from "@/lib/math/savings-calculator";
 import type { SavingsInput, SavingsType, InterestType, TaxType } from "@/lib/types/savings";
+import { MoneyInput, PercentInput, NumberInput } from "@/components/ui";
 
 const savingsTypes: { value: SavingsType; label: string; description: string }[] = [
   { value: "regular", label: "정기적금", description: "매달 일정액 납입" },
@@ -22,29 +23,26 @@ const taxTypes: { value: TaxType; label: string; rate: string }[] = [
 
 export function SavingsCalculator() {
   const [savingsType, setSavingsType] = useState<SavingsType>("regular");
-  const [monthlyDeposit, setMonthlyDeposit] = useState<string>("500000");
-  const [lumpSumDeposit, setLumpSumDeposit] = useState<string>("10000000");
-  const [annualRate, setAnnualRate] = useState<string>("4.0");
-  const [termMonths, setTermMonths] = useState<string>("12");
+  const [monthlyDeposit, setMonthlyDeposit] = useState<number>(500000);
+  const [lumpSumDeposit, setLumpSumDeposit] = useState<number>(10000000);
+  const [annualRate, setAnnualRate] = useState<number>(4.0);
+  const [termMonths, setTermMonths] = useState<number>(12);
   const [interestType, setInterestType] = useState<InterestType>("simple");
   const [taxType, setTaxType] = useState<TaxType>("normal");
 
   const result = useMemo(() => {
-    const monthly = parseInt(monthlyDeposit) || 0;
-    const lumpSum = parseInt(lumpSumDeposit) || 0;
-    const rate = parseFloat(annualRate) / 100 || 0;
-    const months = parseInt(termMonths) || 0;
+    const rate = annualRate / 100 || 0;
 
-    if (months <= 0) return null;
-    if (savingsType === "regular" && monthly <= 0) return null;
-    if (savingsType === "lump-sum" && lumpSum <= 0) return null;
+    if (termMonths <= 0) return null;
+    if (savingsType === "regular" && monthlyDeposit <= 0) return null;
+    if (savingsType === "lump-sum" && lumpSumDeposit <= 0) return null;
 
     const input: SavingsInput = {
       savingsType,
-      monthlyDeposit: monthly,
-      lumpSumDeposit: lumpSum,
+      monthlyDeposit: monthlyDeposit,
+      lumpSumDeposit: lumpSumDeposit,
       annualRate: rate,
-      termMonths: months,
+      termMonths: termMonths,
       interestType,
       taxType,
     };
@@ -100,20 +98,17 @@ export function SavingsCalculator() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             {savingsType === "regular" ? "월 납입금" : "예치금"}
           </label>
-          <input
-            type="text"
-            inputMode="numeric"
+          <MoneyInput
             value={savingsType === "regular" ? monthlyDeposit : lumpSumDeposit}
-            onChange={(e) => {
-              const value = e.target.value.replace(/[^0-9]/g, "");
+            onChange={(v) => {
               if (savingsType === "regular") {
-                setMonthlyDeposit(value);
+                setMonthlyDeposit(v);
               } else {
-                setLumpSumDeposit(value);
+                setLumpSumDeposit(v);
               }
             }}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-right text-lg"
-            placeholder={savingsType === "regular" ? "500,000" : "10,000,000"}
+            step={savingsType === "regular" ? 100000 : 1000000}
+            placeholder={savingsType === "regular" ? "월 납입금" : "예치금"}
           />
           <div className="flex flex-wrap gap-2 mt-2">
             {quickAmounts.map((amount) => (
@@ -121,9 +116,9 @@ export function SavingsCalculator() {
                 key={amount}
                 onClick={() => {
                   if (savingsType === "regular") {
-                    setMonthlyDeposit(amount.toString());
+                    setMonthlyDeposit(amount);
                   } else {
-                    setLumpSumDeposit(amount.toString());
+                    setLumpSumDeposit(amount);
                   }
                 }}
                 className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-blue-100 text-gray-600 hover:text-blue-600 rounded-full transition-colors"
@@ -138,28 +133,27 @@ export function SavingsCalculator() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              연이율 (%)
+              연이율
             </label>
-            <input
-              type="text"
-              inputMode="decimal"
+            <PercentInput
               value={annualRate}
-              onChange={(e) => setAnnualRate(e.target.value.replace(/[^0-9.]/g, ""))}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-right"
-              placeholder="4.0"
+              onChange={setAnnualRate}
+              max={20}
+              step={0.1}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              기간 (개월)
+              기간
             </label>
-            <input
-              type="text"
-              inputMode="numeric"
+            <NumberInput
               value={termMonths}
-              onChange={(e) => setTermMonths(e.target.value.replace(/[^0-9]/g, ""))}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg text-right"
-              placeholder="12"
+              onChange={setTermMonths}
+              min={1}
+              max={60}
+              step={1}
+              format="none"
+              suffix="개월"
             />
           </div>
         </div>
@@ -267,10 +261,18 @@ export function SavingsCalculator() {
             </div>
           </div>
 
-          {/* 안내 문구 */}
-          <div className="text-xs text-gray-500 space-y-1">
-            <p>* {result.summary.savingsType}, {result.summary.interestType} 기준</p>
-            <p>* 실제 이자는 은행별 계산 방식에 따라 달라질 수 있습니다.</p>
+          {/* 계산 공식 */}
+          <div className="bg-gray-50 rounded-lg p-4">
+            <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p className="font-medium">정기적금 (단리)</p>
+              <p>• 이자 = 월납입금 × 이율 × (n+1)/24</p>
+              <p className="font-medium mt-1">정기예금 (단리)</p>
+              <p>• 이자 = 원금 × 이율 × (기간/12)</p>
+              <p className="font-medium mt-1">세금</p>
+              <p>• 이자소득세: 일반 15.4%, 세금우대 9.5%, 비과세 0%</p>
+            </div>
+            <p className="text-xs text-gray-400 mt-2">* 실제 이자는 은행별 계산 방식에 따라 다를 수 있음</p>
           </div>
         </div>
       )}

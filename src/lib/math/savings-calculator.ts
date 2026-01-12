@@ -1,4 +1,4 @@
-import type { SavingsInput, SavingsResult, SavingsType, InterestType, TaxType } from '../types/savings';
+import type { SavingsInput, SavingsResult, InterestType, TaxType } from '../types/savings';
 import { SAVINGS_TAX_2024 } from '../types/savings';
 
 export class SavingsCalculator {

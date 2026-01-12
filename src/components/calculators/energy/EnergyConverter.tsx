@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 
 const units = [
   { key: "J", name: "줄 (J)", factor: 1 },
@@ -19,9 +19,8 @@ const units = [
 export function EnergyConverter() {
   const [value, setValue] = useState("1");
   const [fromUnit, setFromUnit] = useState("kWh");
-  const [results, setResults] = useState<Record<string, string>>({});
 
-  useEffect(() => {
+  const results = useMemo(() => {
     const inputValue = parseFloat(value) || 0;
     const fromFactor = units.find((u) => u.key === fromUnit)?.factor || 1;
     const baseValue = inputValue * fromFactor;
@@ -37,7 +36,7 @@ export function EnergyConverter() {
         newResults[unit.key] = converted.toLocaleString(undefined, { maximumFractionDigits: 6 });
       }
     });
-    setResults(newResults);
+    return newResults;
   }, [value, fromUnit]);
 
   return (

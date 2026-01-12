@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 // 서울시 상수도 요금 (2024년 기준, 가정용)
 const waterRates = [
@@ -12,7 +13,7 @@ const waterRates = [
 const sewageRate = 0.5; // 하수도 요금 (상수도의 약 50%)
 
 export function WaterBillCalculator() {
-  const [usage, setUsage] = useState("20");
+  const [usage, setUsage] = useState<number>(20);
   const [diameter, setDiameter] = useState("15");
 
   // 구경별 기본요금
@@ -26,7 +27,7 @@ export function WaterBillCalculator() {
   };
 
   const calculate = () => {
-    const usageValue = parseFloat(usage) || 0;
+    const usageValue = usage || 0;
     const baseFee = baseFees[diameter] || 1080;
 
     // 누진제 적용 상수도 요금
@@ -77,12 +78,13 @@ export function WaterBillCalculator() {
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">사용량 (m³/톤)</label>
-          <input
-            type="number"
+          <NumberInput
             value={usage}
-            onChange={(e) => setUsage(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-500 text-lg"
-            placeholder="20"
+            onChange={setUsage}
+            min={0}
+            step={1}
+            format="comma"
+            suffix="m³"
           />
         </div>
 
@@ -141,9 +143,20 @@ export function WaterBillCalculator() {
         </div>
       </div>
 
-      <p className="text-xs text-gray-400 mt-4 text-center">
-        * 서울시 기준이며 지역별로 다를 수 있습니다
-      </p>
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 상수도 요금 = 누진제 구간별 요금 합계</p>
+          <p>• 하수도 요금 = 상수도 요금 × 50%</p>
+          <p>• 물이용부담금 = 사용량 × 170원/톤</p>
+          <p>• 총 요금 = (기본요금 + 상수도 + 하수도 + 물이용부담금) × 1.1</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">누진제 구간 (서울시)</p>
+          <p>1~30톤: 360원 | 31~50톤: 550원 | 51톤~: 790원</p>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">서울시 수도요금표 기준</p>
+      </div>
     </div>
   );
 }

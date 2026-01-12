@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MoneyInput } from "@/components/ui";
 
 // 2024년 기준 증여세율
 const taxRates = [
@@ -22,13 +23,13 @@ const exemptions: Record<string, number> = {
 };
 
 export function GiftTaxCalculator() {
-  const [amount, setAmount] = useState("100000000");
+  const [amount, setAmount] = useState<number>(100000000);
   const [relationship, setRelationship] = useState("adult_child");
-  const [priorGifts, setPriorGifts] = useState("0");
+  const [priorGifts, setPriorGifts] = useState<number>(0);
 
   const calculate = () => {
-    const giftAmount = parseFloat(amount) || 0;
-    const prior = parseFloat(priorGifts) || 0;
+    const giftAmount = amount || 0;
+    const prior = priorGifts || 0;
     const exemption = exemptions[relationship];
 
     // 과세표준 = 증여재산 + 10년 내 증여 - 공제
@@ -83,13 +84,12 @@ export function GiftTaxCalculator() {
 
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">증여 금액 (원)</label>
-          <input
-            type="number"
+          <label className="block text-sm font-medium text-gray-700 mb-1">증여 금액</label>
+          <MoneyInput
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-lg"
-            placeholder="100000000"
+            onChange={setAmount}
+            min={0}
+            step={10000000}
           />
         </div>
 
@@ -117,14 +117,13 @@ export function GiftTaxCalculator() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            10년 내 기증여액 (원)
+            10년 내 기증여액
           </label>
-          <input
-            type="number"
+          <MoneyInput
             value={priorGifts}
-            onChange={(e) => setPriorGifts(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500"
-            placeholder="0"
+            onChange={setPriorGifts}
+            min={0}
+            step={10000000}
           />
           <p className="text-xs text-gray-400 mt-1">동일인으로부터 10년 내 받은 증여액</p>
         </div>
@@ -163,9 +162,20 @@ export function GiftTaxCalculator() {
         </div>
       </div>
 
-      <p className="text-xs text-gray-400 mt-4 text-center">
-        * 신고기한 내 자진신고 시 3% 공제 적용
-      </p>
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 과세표준 = 증여재산 + 10년 내 기증여액 - 증여재산공제</p>
+          <p>• 산출세액 = 과세표준 × 세율 - 누진공제</p>
+          <p>• 납부세액 = 산출세액 - 신고세액공제(3%)</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">2024년 증여세율</p>
+          <p>1억 이하: 10% | 5억 이하: 20% | 10억 이하: 30%</p>
+          <p>30억 이하: 40% | 30억 초과: 50%</p>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">* 신고기한 내 자진신고 시 3% 공제 적용</p>
+      </div>
     </div>
   );
 }

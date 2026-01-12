@@ -3,18 +3,16 @@
 import { useState, useMemo } from "react";
 import { bmiCalculator } from "@/lib/math/bmi-calculator";
 import { BMI_CATEGORIES } from "@/lib/types/bmi";
+import { NumberInput } from "@/components/ui";
 
 export function BMICalculator() {
-  const [height, setHeight] = useState<string>("170");
-  const [weight, setWeight] = useState<string>("70");
+  const [height, setHeight] = useState<number>(170);
+  const [weight, setWeight] = useState<number>(70);
 
   const result = useMemo(() => {
-    const h = parseFloat(height) || 0;
-    const w = parseFloat(weight) || 0;
+    if (height <= 0 || weight <= 0) return null;
 
-    if (h <= 0 || w <= 0) return null;
-
-    return bmiCalculator.calculate({ height: h, weight: w });
+    return bmiCalculator.calculate({ height, weight });
   }, [height, weight]);
 
   // BMI 게이지 위치 계산 (0-40 범위)
@@ -30,22 +28,21 @@ export function BMICalculator() {
       <div className="space-y-4 mb-6">
         {/* 키 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            키 (cm)
-          </label>
-          <input
-            type="text"
-            inputMode="decimal"
+          <label className="block text-sm font-medium text-gray-700 mb-2">키</label>
+          <NumberInput
             value={height}
-            onChange={(e) => setHeight(e.target.value.replace(/[^0-9.]/g, ""))}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-right text-lg"
-            placeholder="170"
+            onChange={setHeight}
+            min={100}
+            max={250}
+            step={1}
+            format="none"
+            suffix="cm"
           />
           <div className="flex flex-wrap gap-2 mt-2">
             {[160, 165, 170, 175, 180].map((h) => (
               <button
                 key={h}
-                onClick={() => setHeight(h.toString())}
+                onClick={() => setHeight(h)}
                 className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-blue-100 text-gray-600 hover:text-blue-600 rounded-full transition-colors"
               >
                 {h}cm
@@ -56,22 +53,21 @@ export function BMICalculator() {
 
         {/* 몸무게 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            몸무게 (kg)
-          </label>
-          <input
-            type="text"
-            inputMode="decimal"
+          <label className="block text-sm font-medium text-gray-700 mb-2">몸무게</label>
+          <NumberInput
             value={weight}
-            onChange={(e) => setWeight(e.target.value.replace(/[^0-9.]/g, ""))}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-right text-lg"
-            placeholder="70"
+            onChange={setWeight}
+            min={20}
+            max={200}
+            step={1}
+            format="none"
+            suffix="kg"
           />
           <div className="flex flex-wrap gap-2 mt-2">
             {[50, 60, 70, 80, 90].map((w) => (
               <button
                 key={w}
-                onClick={() => setWeight(w.toString())}
+                onClick={() => setWeight(w)}
                 className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-blue-100 text-gray-600 hover:text-blue-600 rounded-full transition-colors"
               >
                 {w}kg
@@ -167,10 +163,17 @@ export function BMICalculator() {
             </div>
           </div>
 
-          {/* 안내 문구 */}
-          <div className="text-xs text-gray-500">
-            <p>* 아시아-태평양 BMI 기준으로 계산됩니다.</p>
-            <p>* BMI는 참고용이며, 근육량 등에 따라 달라질 수 있습니다.</p>
+          {/* 계산 공식 */}
+          <div className="bg-gray-50 rounded-lg p-4">
+            <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>• BMI = 체중(kg) ÷ 키(m)²</p>
+              <p>• 정상 체중 범위 = 키(m)² × 18.5 ~ 키(m)² × 22.9</p>
+            </div>
+            <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+              <p>아시아-태평양 기준 (WHO-WPRO, 2000)</p>
+              <p className="mt-1">* BMI는 참고용이며, 근육량/체지방률에 따라 다를 수 있음</p>
+            </div>
           </div>
         </div>
       )}

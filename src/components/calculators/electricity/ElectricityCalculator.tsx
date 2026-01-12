@@ -1,16 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 type SeasonType = "summer" | "other";
 
 export function ElectricityCalculator() {
-  const [usage, setUsage] = useState("350");
+  const [usage, setUsage] = useState<number>(350);
   const [season, setSeason] = useState<SeasonType>("other");
 
   const calculate = () => {
-    const kwh = parseFloat(usage);
-    if (isNaN(kwh) || kwh < 0) return null;
+    const kwh = usage || 0;
+    if (kwh < 0) return null;
 
     // 2024년 기준 주택용 전기요금 (저압)
     // 기본요금 + 전력량 요금 + 기후환경요금 + 연료비조정액
@@ -83,13 +84,13 @@ export function ElectricityCalculator() {
       <div className="space-y-4 mb-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">사용량 (kWh)</label>
-          <input
-            type="number"
+          <NumberInput
             value={usage}
-            onChange={(e) => setUsage(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-500 text-lg"
-            placeholder="350"
-            min="0"
+            onChange={setUsage}
+            min={0}
+            step={10}
+            format="comma"
+            suffix="kWh"
           />
         </div>
 
@@ -163,22 +164,29 @@ export function ElectricityCalculator() {
       )}
 
       <div className="mt-4 p-4 bg-gray-50 rounded-xl">
-        <p className="text-sm font-medium text-gray-700 mb-2">누진제 구간</p>
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
         <div className="text-xs text-gray-500 space-y-1">
+          <p>• 전기요금 = 기본요금 + 전력량요금 + 기후환경요금 + 연료비조정액</p>
+          <p>• 기후환경요금 = 사용량 × 9원/kWh</p>
+          <p>• 연료비조정액 = 사용량 × 5원/kWh</p>
+          <p>• 부가세 = 소계 × 10%</p>
+          <p>• 전력산업기반기금 = 소계 × 3.7%</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">누진제 구간 ({season === "other" ? "봄/가을/겨울" : "여름"})</p>
           {season === "other" ? (
             <>
-              <p>• 1구간: 0~200kWh (120원/kWh)</p>
-              <p>• 2구간: 201~400kWh (214.6원/kWh)</p>
-              <p>• 3구간: 401kWh~ (307.3원/kWh)</p>
+              <p>1구간: 0~200kWh (120원) | 2구간: 201~400kWh (214.6원)</p>
+              <p>3구간: 401kWh~ (307.3원)</p>
             </>
           ) : (
             <>
-              <p>• 1구간: 0~300kWh (120원/kWh)</p>
-              <p>• 2구간: 301~450kWh (214.6원/kWh)</p>
-              <p>• 3구간: 451kWh~ (307.3원/kWh)</p>
+              <p>1구간: 0~300kWh (120원) | 2구간: 301~450kWh (214.6원)</p>
+              <p>3구간: 451kWh~ (307.3원)</p>
             </>
           )}
         </div>
+        <p className="text-xs text-gray-400 mt-2">2024년 한국전력 요금표 기준</p>
       </div>
     </div>
   );

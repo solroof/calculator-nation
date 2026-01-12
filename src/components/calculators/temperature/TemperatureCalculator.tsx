@@ -1,31 +1,47 @@
 "use client";
 
-import { useState, useEffect } from "react";
-
-type TempUnit = "celsius" | "fahrenheit" | "kelvin";
+import { useState } from "react";
 
 export function TemperatureCalculator() {
   const [celsius, setCelsius] = useState("");
   const [fahrenheit, setFahrenheit] = useState("");
   const [kelvin, setKelvin] = useState("");
-  const [lastEdited, setLastEdited] = useState<TempUnit>("celsius");
 
-  useEffect(() => {
-    const c = parseFloat(celsius);
-    const f = parseFloat(fahrenheit);
-    const k = parseFloat(kelvin);
-
-    if (lastEdited === "celsius" && !isNaN(c)) {
+  const handleCelsiusChange = (value: string) => {
+    setCelsius(value);
+    const c = parseFloat(value);
+    if (!isNaN(c)) {
       setFahrenheit(((c * 9) / 5 + 32).toFixed(2));
       setKelvin((c + 273.15).toFixed(2));
-    } else if (lastEdited === "fahrenheit" && !isNaN(f)) {
+    } else {
+      setFahrenheit("");
+      setKelvin("");
+    }
+  };
+
+  const handleFahrenheitChange = (value: string) => {
+    setFahrenheit(value);
+    const f = parseFloat(value);
+    if (!isNaN(f)) {
       setCelsius((((f - 32) * 5) / 9).toFixed(2));
       setKelvin((((f - 32) * 5) / 9 + 273.15).toFixed(2));
-    } else if (lastEdited === "kelvin" && !isNaN(k)) {
+    } else {
+      setCelsius("");
+      setKelvin("");
+    }
+  };
+
+  const handleKelvinChange = (value: string) => {
+    setKelvin(value);
+    const k = parseFloat(value);
+    if (!isNaN(k)) {
       setCelsius((k - 273.15).toFixed(2));
       setFahrenheit((((k - 273.15) * 9) / 5 + 32).toFixed(2));
+    } else {
+      setCelsius("");
+      setFahrenheit("");
     }
-  }, [celsius, fahrenheit, kelvin, lastEdited]);
+  };
 
   const quickTemps = [
     { label: "물 어는점", c: 0 },
@@ -50,10 +66,7 @@ export function TemperatureCalculator() {
           {quickTemps.map((temp) => (
             <button
               key={temp.label}
-              onClick={() => {
-                setCelsius(temp.c.toString());
-                setLastEdited("celsius");
-              }}
+              onClick={() => handleCelsiusChange(temp.c.toString())}
               className="px-3 py-1.5 rounded-lg text-sm bg-gray-100 text-gray-700 hover:bg-cyan-100 hover:text-cyan-700 transition-all"
             >
               {temp.label}
@@ -69,10 +82,7 @@ export function TemperatureCalculator() {
             <input
               type="number"
               value={celsius}
-              onChange={(e) => {
-                setCelsius(e.target.value);
-                setLastEdited("celsius");
-              }}
+              onChange={(e) => handleCelsiusChange(e.target.value)}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl text-lg focus:ring-2 focus:ring-cyan-500"
               placeholder="25"
             />
@@ -86,10 +96,7 @@ export function TemperatureCalculator() {
             <input
               type="number"
               value={fahrenheit}
-              onChange={(e) => {
-                setFahrenheit(e.target.value);
-                setLastEdited("fahrenheit");
-              }}
+              onChange={(e) => handleFahrenheitChange(e.target.value)}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl text-lg focus:ring-2 focus:ring-cyan-500"
               placeholder="77"
             />
@@ -103,10 +110,7 @@ export function TemperatureCalculator() {
             <input
               type="number"
               value={kelvin}
-              onChange={(e) => {
-                setKelvin(e.target.value);
-                setLastEdited("kelvin");
-              }}
+              onChange={(e) => handleKelvinChange(e.target.value)}
               className="w-full px-4 py-3 border border-gray-200 rounded-xl text-lg focus:ring-2 focus:ring-cyan-500"
               placeholder="298.15"
             />
@@ -115,9 +119,20 @@ export function TemperatureCalculator() {
         </div>
       </div>
 
-      <div className="mt-4 text-xs text-gray-400 space-y-1">
-        <p>• °F = °C × 9/5 + 32</p>
-        <p>• K = °C + 273.15</p>
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• °F = °C × 9/5 + 32</p>
+          <p>• °C = (°F - 32) × 5/9</p>
+          <p>• K = °C + 273.15</p>
+          <p>• °C = K - 273.15</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">주요 기준점</p>
+          <p>• 절대영도: 0K = -273.15°C = -459.67°F</p>
+          <p>• 물 어는점: 0°C = 32°F = 273.15K</p>
+          <p>• 물 끓는점: 100°C = 212°F = 373.15K</p>
+        </div>
       </div>
     </div>
   );

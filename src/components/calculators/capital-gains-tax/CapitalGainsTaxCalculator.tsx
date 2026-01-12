@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { capitalGainsTaxCalculator } from "@/lib/math/capital-gains-tax-calculator";
 import type { CapitalGainsTaxInput, PropertyType, HouseCount } from "@/lib/types/capital-gains-tax";
+import { DatePicker, MoneyInput, NumberInput } from "@/components/ui";
 
 const propertyTypes: { value: PropertyType; label: string }[] = [
   { value: "apartment", label: "아파트" },
@@ -13,22 +14,22 @@ const propertyTypes: { value: PropertyType; label: string }[] = [
 
 export function CapitalGainsTaxCalculator() {
   const [propertyType, setPropertyType] = useState<PropertyType>("apartment");
-  const [acquisitionPrice, setAcquisitionPrice] = useState<string>("500000000");
-  const [sellingPrice, setSellingPrice] = useState<string>("700000000");
+  const [acquisitionPrice, setAcquisitionPrice] = useState<number>(500000000);
+  const [sellingPrice, setSellingPrice] = useState<number>(700000000);
   const [acquisitionDate, setAcquisitionDate] = useState<string>("2020-01-01");
   const [sellingDate, setSellingDate] = useState<string>("2024-01-01");
-  const [expenses, setExpenses] = useState<string>("10000000");
+  const [expenses, setExpenses] = useState<number>(10000000);
   const [houseCount, setHouseCount] = useState<HouseCount>(1);
   const [isRegulatedArea, setIsRegulatedArea] = useState<boolean>(false);
-  const [residenceYears, setResidenceYears] = useState<string>("2");
+  const [residenceYears, setResidenceYears] = useState<number>(2);
   const [isOneHouseExemption, setIsOneHouseExemption] = useState<boolean>(false);
 
   const isHousing = propertyType === "house" || propertyType === "apartment";
 
   const result = useMemo(() => {
-    const acqPrice = parseInt(acquisitionPrice) || 0;
-    const sellPrice = parseInt(sellingPrice) || 0;
-    const exp = parseInt(expenses) || 0;
+    const acqPrice = acquisitionPrice || 0;
+    const sellPrice = sellingPrice || 0;
+    const exp = expenses || 0;
 
     if (acqPrice <= 0 || sellPrice <= 0) return null;
 
@@ -41,7 +42,7 @@ export function CapitalGainsTaxCalculator() {
       expenses: exp,
       houseCount: isHousing ? houseCount : undefined,
       isRegulatedArea: isHousing ? isRegulatedArea : undefined,
-      residenceYears: isHousing ? parseInt(residenceYears) || 0 : undefined,
+      residenceYears: isHousing ? (residenceYears || 0) : undefined,
       isOneHouseExemption: isHousing && houseCount === 1 ? isOneHouseExemption : undefined,
     };
 
@@ -96,26 +97,22 @@ export function CapitalGainsTaxCalculator() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               취득가액
             </label>
-            <input
-              type="text"
-              inputMode="numeric"
+            <MoneyInput
               value={acquisitionPrice}
-              onChange={(e) => setAcquisitionPrice(e.target.value.replace(/[^0-9]/g, ""))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-right"
-              placeholder="500,000,000"
+              onChange={setAcquisitionPrice}
+              min={0}
+              step={10000000}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               양도가액
             </label>
-            <input
-              type="text"
-              inputMode="numeric"
+            <MoneyInput
               value={sellingPrice}
-              onChange={(e) => setSellingPrice(e.target.value.replace(/[^0-9]/g, ""))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-right"
-              placeholder="700,000,000"
+              onChange={setSellingPrice}
+              min={0}
+              step={10000000}
             />
           </div>
         </div>
@@ -126,22 +123,20 @@ export function CapitalGainsTaxCalculator() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               취득일
             </label>
-            <input
-              type="date"
+            <DatePicker
               value={acquisitionDate}
-              onChange={(e) => setAcquisitionDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              onChange={setAcquisitionDate}
+              placeholder="취득일 선택"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               양도일
             </label>
-            <input
-              type="date"
+            <DatePicker
               value={sellingDate}
-              onChange={(e) => setSellingDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              onChange={setSellingDate}
+              placeholder="양도일 선택"
             />
           </div>
         </div>
@@ -151,13 +146,11 @@ export function CapitalGainsTaxCalculator() {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             필요경비 (취득세, 중개수수료 등)
           </label>
-          <input
-            type="text"
-            inputMode="numeric"
+          <MoneyInput
             value={expenses}
-            onChange={(e) => setExpenses(e.target.value.replace(/[^0-9]/g, ""))}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg text-right"
-            placeholder="10,000,000"
+            onChange={setExpenses}
+            min={0}
+            step={1000000}
           />
         </div>
 
@@ -194,13 +187,14 @@ export function CapitalGainsTaxCalculator() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     거주 기간 (년)
                   </label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
+                  <NumberInput
                     value={residenceYears}
-                    onChange={(e) => setResidenceYears(e.target.value.replace(/[^0-9]/g, ""))}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-right"
-                    placeholder="2"
+                    onChange={setResidenceYears}
+                    min={0}
+                    max={30}
+                    step={1}
+                    format="none"
+                    suffix="년"
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     2년 이상 거주 시 장기보유특별공제 추가 적용
@@ -297,11 +291,17 @@ export function CapitalGainsTaxCalculator() {
             </div>
           </div>
 
-          {/* 안내 문구 */}
-          <div className="text-xs text-gray-500 space-y-1">
-            <p>* 2024년 양도소득세 기준으로 계산됩니다.</p>
-            <p>* 실제 세금은 개인 상황에 따라 달라질 수 있습니다.</p>
-            <p>* 정확한 금액은 세무 전문가와 상담하세요.</p>
+          {/* 계산 공식 */}
+          <div className="bg-gray-50 rounded-lg p-4">
+            <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+            <div className="text-xs text-gray-500 space-y-1">
+              <p>• 양도차익 = 양도가액 - 취득가액 - 필요경비</p>
+              <p>• 장기보유특별공제 = 양도차익 × 공제율 (보유/거주기간별)</p>
+              <p>• 과세표준 = 양도차익 - 장기보유특별공제 - 기본공제(250만원)</p>
+              <p>• 양도소득세 = 과세표준 × 세율 - 누진공제</p>
+              <p>• 지방소득세 = 양도소득세 × 10%</p>
+            </div>
+            <p className="text-xs text-gray-400 mt-2">2024년 소득세법 기준 · 실제 세금은 개인 상황에 따라 다를 수 있음</p>
           </div>
         </div>
       )}

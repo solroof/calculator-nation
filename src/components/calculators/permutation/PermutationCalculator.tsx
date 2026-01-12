@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { NumberInput } from "@/components/ui";
 
 export function PermutationCalculator() {
-  const [n, setN] = useState("10");
-  const [r, setR] = useState("3");
+  const [n, setN] = useState<number>(10);
+  const [r, setR] = useState<number>(3);
 
   // 팩토리얼 (큰 수 처리)
   const factorial = (num: number): number => {
@@ -53,8 +54,8 @@ export function PermutationCalculator() {
     return combination(n + r - 1, r);
   };
 
-  const nVal = parseInt(n) || 0;
-  const rVal = parseInt(r) || 0;
+  const nVal = n || 0;
+  const rVal = r || 0;
 
   const results = {
     permutation: permutation(nVal, rVal),
@@ -85,24 +86,22 @@ export function PermutationCalculator() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">n (전체 개수)</label>
-            <input
-              type="number"
+            <NumberInput
               value={n}
-              onChange={(e) => setN(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 text-lg"
-              placeholder="10"
-              min="0"
+              onChange={setN}
+              min={0}
+              step={1}
+              format="none"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">r (선택 개수)</label>
-            <input
-              type="number"
+            <NumberInput
               value={r}
-              onChange={(e) => setR(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-violet-500 text-lg"
-              placeholder="3"
-              min="0"
+              onChange={setR}
+              min={0}
+              step={1}
+              format="none"
             />
           </div>
         </div>
@@ -162,6 +161,22 @@ export function PermutationCalculator() {
         <div className="p-3 bg-gray-50 rounded-xl text-center">
           <p className="text-gray-500 text-xs">r!</p>
           <p className="font-mono font-medium">{formatNumber(results.rFactorial)}</p>
+        </div>
+      </div>
+
+      <div className="mt-4 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm font-medium text-gray-700 mb-2">계산 공식</p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p>• 순열: nPr = n! / (n-r)!</p>
+          <p>• 조합: nCr = n! / (r!(n-r)!)</p>
+          <p>• 중복순열: nΠr = n^r</p>
+          <p>• 중복조합: nHr = (n+r-1)Cr</p>
+          <p>• 팩토리얼: n! = n × (n-1) × ... × 2 × 1</p>
+        </div>
+        <div className="text-xs text-gray-500 mt-2 pt-2 border-t border-gray-200">
+          <p className="font-medium mb-1">순열 vs 조합</p>
+          <p>• 순열: 순서가 중요 (ex: 비밀번호)</p>
+          <p>• 조합: 순서 무관 (ex: 로또 번호)</p>
         </div>
       </div>
     </div>
